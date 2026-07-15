@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
     title: {
         default: "Picnic Registration Confirmation | Bangalore",
-        template: "%s | Picnic with Apt"
+        template: "%s | BLR Picnic"
     },
     description: "Confirm your registration for the picnic with Aptputra bhaio by paying the registration amount.",
     authors: [{name: "Divyansh Gemini"}],
