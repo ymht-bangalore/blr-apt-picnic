@@ -191,7 +191,7 @@ export default function SubmissionDetailsModal({
                 Fare: ₹{publicConfig.picnicFare}/person
               </span>
                         </div>
-                        <div className="space-y-2 max-h-[180px] overflow-y-auto pr-1">
+                        <div className="space-y-2 max-h-45 overflow-y-auto pr-1">
                             {submission.people.map((person, idx) => (
                                 <div
                                     key={idx}
@@ -210,7 +210,7 @@ export default function SubmissionDetailsModal({
                                             </div>
                                             <div className="text-xs text-stone-500 flex items-center gap-1 mt-0.5">
                                                 <Phone20Regular className="w-3.5 h-3.5 text-stone-400"/>
-                                                {person.mobile}
+                                                {person.mobile || '—'}
                                             </div>
                                         </div>
                                     </div>

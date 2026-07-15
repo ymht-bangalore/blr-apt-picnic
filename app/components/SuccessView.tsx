@@ -107,8 +107,10 @@ export default function SuccessView({
                         {people.map((person, index) => (
                             <div key={index}
                                  className="flex justify-between items-center px-4 py-3 bg-white hover:bg-stone-50/30 text-sm">
-                                <span className="font-bold text-stone-900">{person.name}</span>
-                                <span className="font-mono font-semibold text-stone-700">{person.mobile}</span>
+                                <span className="font-bold text-stone-900">
+                                    {person.name}{index === 0 ? ' (You)' : ''}
+                                </span>
+                                <span className="font-mono font-semibold text-stone-700">{person.mobile || '—'}</span>
                             </div>
                         ))}
                     </div>

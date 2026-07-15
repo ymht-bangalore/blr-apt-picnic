@@ -27,16 +27,28 @@ export async function registerMahatmas(
         return {success: false, isDemo: !isSupabaseConfigured, error: 'Please enter at least one person.'};
     }
 
-    for (const person of people) {
+    for (let i = 0; i < people.length; i++) {
+        const person = people[i];
         if (!person.name.trim()) {
             return {success: false, isDemo: !isSupabaseConfigured, error: 'All names must be filled out.'};
         }
-        if (!/^\d{10}$/.test(person.mobile.trim())) {
-            return {
-                success: false,
-                isDemo: !isSupabaseConfigured,
-                error: `Invalid mobile number for ${person.name}. Must be exactly 10 digits.`
-            };
+        const cleanMobile = person.mobile.trim();
+        if (i === 0) {
+            if (!/^\d{10}$/.test(cleanMobile)) {
+                return {
+                    success: false,
+                    isDemo: !isSupabaseConfigured,
+                    error: `Invalid mobile number for primary attendee ${person.name}. Must be exactly 10 digits.`
+                };
+            }
+        } else {
+            if (cleanMobile && !/^\d{10}$/.test(cleanMobile)) {
+                return {
+                    success: false,
+                    isDemo: !isSupabaseConfigured,
+                    error: `Invalid mobile number for attendee ${person.name}. Must be exactly 10 digits if provided.`
+                };
+            }
         }
     }
 
@@ -55,7 +67,7 @@ export async function registerMahatmas(
 
             const filePath = `${Date.now()}_${Math.random().toString(36).substring(2, 11)}_${cleanFileName}.${fileExt}`;
 
-            const {data: uploadData, error: uploadError} = await supabase.storage
+            const {error: uploadError} = await supabase.storage
                 .from('screenshots')
                 .upload(filePath, screenshotFile, {
                     cacheControl: '3600',

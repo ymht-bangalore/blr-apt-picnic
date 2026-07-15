@@ -226,7 +226,7 @@ export default function AdminDashboardPage() {
                 rows.push([
                     counter.toString(),
                     person.name,
-                    person.mobile,
+                    person.mobile || '',
                     primaryContact,
                     primaryMobile,
                     fare.toString(),
@@ -261,9 +261,9 @@ export default function AdminDashboardPage() {
     const filteredSubmissions = submissions.filter((sub) => {
         const person1 = sub.people?.[0];
         const nameMatch = person1?.name?.toLowerCase().includes(searchQuery.toLowerCase());
-        const phoneMatch = person1?.mobile?.includes(searchQuery) || false;
+        const phoneMatch = (person1?.mobile || '').includes(searchQuery) || false;
         const anyAttendeeMatch = sub.people?.some(p =>
-            p.name.toLowerCase().includes(searchQuery.toLowerCase()) || p.mobile.includes(searchQuery)
+            p.name.toLowerCase().includes(searchQuery.toLowerCase()) || (p.mobile || '').includes(searchQuery)
         ) || false;
 
         const matchesSearch = nameMatch || phoneMatch || anyAttendeeMatch;
@@ -301,7 +301,7 @@ export default function AdminDashboardPage() {
                 {/* Banner Alert for Demo Mode */}
                 {isDemoMode && (
                     <div
-                        className="bg-[#fdf7f0] border border-accent/20 rounded-3xl p-5 text-sm text-accent-hover flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-sm">
+                        className="bg-accent-light border border-accent/20 rounded-3xl p-5 text-sm text-accent-hover flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-sm">
                         <div className="flex items-start gap-3">
                             <span className="text-2xl mt-0.5 shrink-0">💡</span>
                             <div>

@@ -70,9 +70,9 @@ export default function MahatmasForm({people, onChange, errors}: MahatmasFormPro
                         >
                             {/* Row Header */}
                             <div className="flex items-center justify-between mb-4">
-                <span className="text-xs font-bold text-stone-600 uppercase tracking-wider">
-                  Attendee #{index + 1}
-                </span>
+                                <span className="text-xs font-bold text-stone-600 uppercase tracking-wider">
+                                  Attendee #{index + 1} {index === 0 && '(You)'}
+                                </span>
 
                                 {people.length > 1 && (
                                     <button
@@ -132,7 +132,8 @@ export default function MahatmasForm({people, onChange, errors}: MahatmasFormPro
                                 <div>
                                     <label htmlFor={`mobile-${index}`}
                                            className="block text-sm font-semibold text-stone-800 mb-1.5">
-                                        Mobile Number
+                                        Mobile Number {index > 0 &&
+                                        <span className="text-stone-500 font-normal text-xs">(Optional)</span>}
                                     </label>
                                     <div className="relative">
                                         <div
@@ -149,7 +150,7 @@ export default function MahatmasForm({people, onChange, errors}: MahatmasFormPro
                                             className={`w-full pl-10 pr-10 py-2.5 rounded-lg border bg-white text-stone-900 placeholder-stone-500 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all ${
                                                 rowError.mobile ? 'border-red-400 focus:border-red-500 focus:ring-red-500/20' : 'border-stone-300'
                                             }`}
-                                            required
+                                            required={index === 0}
                                         />
                                         {person.mobile && (
                                             <button
@@ -177,9 +178,9 @@ export default function MahatmasForm({people, onChange, errors}: MahatmasFormPro
                 <button
                     type="button"
                     onClick={addPerson}
-                    className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl border-2 border-dashed border-stone-300 text-stone-700 font-bold hover:border-primary hover:text-primary hover:bg-[#FDF1ED]/40 transition-all duration-150 focus:ring-2 focus:ring-[#CB4B1F]/20 cursor-pointer"
+                    className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl border-2 border-dashed border-primary text-primary font-bold hover:border-primary-hover hover:text-primary-hover hover:bg-[#FDF1ED]/40 transition-all duration-150 focus:ring-2 focus:ring-primary/20 cursor-pointer"
                 >
-                    <Add20Regular className="text-[#CB4B1F] shrink-0 font-extrabold"/>
+                    <Add20Regular className=" shrink-0 font-extrabold"/>
                     Add More Attendees
                 </button>
             </div>
