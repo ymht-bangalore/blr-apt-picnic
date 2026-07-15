@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, {useEffect} from 'react';
 import {
     CheckmarkCircle48Filled,
     Calendar20Regular,
@@ -27,6 +27,10 @@ export default function SuccessView({
                                         isDemo,
                                         onReset
                                     }: SuccessViewProps) {
+    useEffect(() => {
+        window.scrollTo({top: 0, behavior: 'smooth'});
+    }, []);
+
     const handlePrint = () => {
         window.print();
     };

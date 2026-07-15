@@ -10,7 +10,8 @@ import {
     Image20Regular,
     CheckmarkCircle24Filled,
     DismissCircle24Filled,
-    Warning24Filled
+    Warning24Filled,
+    Call20Filled
 } from '@fluentui/react-icons';
 import {publicConfig} from '@/lib/publicConfig';
 
@@ -214,12 +215,23 @@ export default function SubmissionDetailsModal({
                                             </div>
                                         </div>
                                     </div>
-                                    {idx === 0 && (
-                                        <span
-                                            className="text-[10px] bg-primary-light text-primary font-bold px-2 py-0.5 rounded-md border border-primary/10">
-                      Primary Contact
-                    </span>
-                                    )}
+                                    <div className="flex items-center gap-2">
+                                        {idx === 0 && (
+                                            <span
+                                                className="text-[10px] bg-primary-light text-primary font-bold px-2 py-0.5 rounded-md border border-primary/10 select-none">
+                                                Primary Contact
+                                            </span>
+                                        )}
+                                        {person.mobile && (
+                                            <a
+                                                href={`tel:+91${person.mobile}`}
+                                                className="p-1 text-emerald-600 hover:text-emerald-700 hover:scale-110 transition-all flex items-center justify-center cursor-pointer"
+                                                title={`Call ${person.name} (${person.mobile})`}
+                                            >
+                                                <Call20Filled className="w-5 h-5 shrink-0"/>
+                                            </a>
+                                        )}
+                                    </div>
                                 </div>
                             ))}
                         </div>
@@ -244,17 +256,6 @@ export default function SubmissionDetailsModal({
                             View Screenshot
                         </button>
                     </div>
-                </div>
-
-                {/* Footer */}
-                <div className="p-4 bg-stone-50 border-t border-stone-100 flex justify-end">
-                    <button
-                        type="button"
-                        onClick={onClose}
-                        className="py-2.5 px-5 bg-white border border-stone-200 text-stone-700 text-xs font-bold rounded-xl hover:bg-stone-100 transition-colors cursor-pointer"
-                    >
-                        Close Details
-                    </button>
                 </div>
             </div>
         </div>

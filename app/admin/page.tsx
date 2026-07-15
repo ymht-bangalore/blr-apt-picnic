@@ -11,7 +11,8 @@ import {
     CheckmarkCircle24Filled,
     DismissCircle24Filled,
     Warning24Filled,
-    ArrowDownload24Regular
+    ArrowDownload24Regular,
+    Dismiss20Regular
 } from '@fluentui/react-icons';
 
 // Import subcomponents
@@ -373,8 +374,18 @@ export default function AdminDashboardPage() {
                                 placeholder="Search by name or mobile..."
                                 value={searchQuery}
                                 onChange={(e) => startTransition(() => setSearchQuery(e.target.value))}
-                                className="w-full pl-12 pr-4 py-3 bg-white border border-stone-200 rounded-2xl text-sm placeholder-stone-400 focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all duration-150"
+                                className="w-full pl-12 pr-10 py-3 bg-white border border-stone-200 rounded-2xl text-sm placeholder-stone-400 focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all duration-150"
                             />
+                            {searchQuery && (
+                                <button
+                                    type="button"
+                                    onClick={() => startTransition(() => setSearchQuery(''))}
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-700 cursor-pointer focus:outline-none"
+                                    title="Clear search"
+                                >
+                                    <Dismiss20Regular className="w-4 h-4"/>
+                                </button>
+                            )}
                         </div>
 
                         {/* Middle & Right Section Container */}
