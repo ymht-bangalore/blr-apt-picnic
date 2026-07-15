@@ -10,7 +10,8 @@ import {
     ChevronRight24Regular,
     CheckmarkCircle24Filled,
     DismissCircle24Filled,
-    Warning24Filled
+    Warning24Filled,
+    ArrowDownload24Regular
 } from '@fluentui/react-icons';
 
 // Import subcomponents
@@ -201,6 +202,61 @@ export default function AdminDashboardPage() {
         }
     };
 
+    const handleDownloadCSV = () => {
+        if (filteredSubmissions.length === 0) return;
+
+        // 1. Compile CSV rows with all attendees
+        const rows: string[][] = [
+            ['S.No', 'Attendee Name', 'Attendee Mobile', 'Primary Contact Name', 'Primary Contact Mobile', 'Fare Paid (₹)', 'Verification Status', 'Submission Date']
+        ];
+
+        let counter = 1;
+        filteredSubmissions.forEach(sub => {
+            const primaryContact = sub.people[0]?.name || 'N/A';
+            const primaryMobile = sub.people[0]?.mobile || 'N/A';
+            const fare = sub.amount;
+            const status = sub.status.toUpperCase();
+            const date = new Date(sub.created_at).toLocaleDateString('en-IN', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+
+            sub.people.forEach(person => {
+                rows.push([
+                    counter.toString(),
+                    person.name,
+                    person.mobile,
+                    primaryContact,
+                    primaryMobile,
+                    fare.toString(),
+                    status,
+                    date
+                ]);
+                counter++;
+            });
+        });
+
+        // 2. Format columns safely as valid CSV (escape quotes, handle trailing line breaks)
+        const csvContent = rows
+            .map(row => row.map(val => `"${val.replace(/"/g, '""')}"`).join(','))
+            .join('\r\n');
+
+        // 3. Create blob download anchor and execute click
+        const blob = new Blob([csvContent], {type: 'text/csv;charset=utf-8;'});
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.setAttribute('href', url);
+
+        const dateStamp = new Date().toISOString().split('T')[0];
+        link.setAttribute('download', `picnic_attendees_${statusFilter}_${dateStamp}.csv`);
+        link.style.visibility = 'hidden';
+
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
     // Filter & Search submissions
     const filteredSubmissions = submissions.filter((sub) => {
         const person1 = sub.people?.[0];
@@ -305,10 +361,10 @@ export default function AdminDashboardPage() {
 
                     {/* Controls Bar */}
                     <div
-                        className="p-6 border-b border-stone-100 flex flex-col sm:flex-row gap-4 items-center justify-between bg-stone-50/30">
+                        className="p-6 border-b border-stone-100 flex flex-col lg:flex-row gap-4 items-stretch lg:items-center justify-between bg-stone-50/30">
 
                         {/* Search Input */}
-                        <div className="relative w-full sm:max-w-md">
+                        <div className="relative w-full lg:max-w-md">
               <span className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400">
                 <Search24Regular className="w-5 h-5"/>
               </span>
@@ -321,30 +377,50 @@ export default function AdminDashboardPage() {
                             />
                         </div>
 
-                        {/* Filter Buttons */}
-                        <div className="flex items-center gap-2 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0 shrink-0">
-              <span className="text-xs font-bold text-stone-500 flex items-center gap-1 mr-2 shrink-0">
-                <Filter24Regular className="w-4 h-4"/>
-                Filter status:
-              </span>
-                            {[
-                                {label: 'All', value: 'all'},
-                                {label: 'Pending', value: 'pending'},
-                                {label: 'Verified', value: 'verified'},
-                                {label: 'Cancelled', value: 'cancelled'},
-                            ].map((opt) => (
-                                <button
-                                    key={opt.value}
-                                    onClick={() => startTransition(() => setStatusFilter(opt.value))}
-                                    className={`px-4 py-2.5 rounded-xl text-xs font-bold border transition-all cursor-pointer whitespace-nowrap ${
-                                        statusFilter === opt.value
-                                            ? 'bg-primary border-primary text-white shadow-sm'
-                                            : 'bg-white hover:bg-stone-50 border-stone-200 text-stone-600'
-                                    }`}
-                                >
-                                    {opt.label}
-                                </button>
-                            ))}
+                        {/* Middle & Right Section Container */}
+                        <div
+                            className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between lg:justify-end gap-4 flex-1">
+
+                            {/* Filter Buttons */}
+                            <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0 shrink-0">
+                                <span
+                                    className="text-xs font-bold text-stone-500 flex items-center gap-1 mr-2 shrink-0">
+                                    <Filter24Regular className="w-4 h-4"/>
+                                    Filter status:
+                                </span>
+                                {[
+                                    {label: 'All', value: 'all'},
+                                    {label: 'Pending', value: 'pending'},
+                                    {label: 'Verified', value: 'verified'},
+                                    {label: 'Cancelled', value: 'cancelled'},
+                                ].map((opt) => (
+                                    <button
+                                        type="button"
+                                        key={opt.value}
+                                        onClick={() => startTransition(() => setStatusFilter(opt.value))}
+                                        className={`px-4 py-2.5 rounded-xl text-xs font-bold border transition-all cursor-pointer whitespace-nowrap ${
+                                            statusFilter === opt.value
+                                                ? 'bg-primary border-primary text-white shadow-sm'
+                                                : 'bg-white hover:bg-stone-50 border-stone-200 text-stone-600'
+                                        }`}
+                                    >
+                                        {opt.label}
+                                    </button>
+                                ))}
+                            </div>
+
+                            {/* Download CSV button */}
+                            <button
+                                type="button"
+                                onClick={handleDownloadCSV}
+                                disabled={filteredSubmissions.length === 0}
+                                className="flex items-center justify-center gap-2 px-5 py-2.5 bg-white hover:bg-stone-50 border border-stone-200 rounded-xl text-xs font-bold text-stone-700 shadow-sm transition-all duration-150 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98] shrink-0"
+                                title="Download spreadsheet of attendees matching current filter"
+                            >
+                                <ArrowDownload24Regular className="w-5 h-5 text-emerald-600 shrink-0"/>
+                                Export CSV
+                            </button>
+
                         </div>
 
                     </div>
