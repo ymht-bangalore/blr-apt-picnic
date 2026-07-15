@@ -290,7 +290,10 @@ export default function RegistrationPage() {
 
                             {/* Step 2: Payment Details */}
                             <div id="payment-details-section" className="scroll-mt-6">
-                                <PaymentSection peopleCount={people.length}/>
+                                <PaymentSection
+                                    peopleCount={people.length}
+                                    mainAttendeeName={people[0]?.name || ''}
+                                />
                             </div>
 
                             {/* Step 3: Screenshot & Submissions */}
