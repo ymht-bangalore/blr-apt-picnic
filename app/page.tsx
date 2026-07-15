@@ -1,6 +1,6 @@
 'use client';
 
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {registerMahatmas, Mahatma} from '@/lib/db';
 import {publicConfig} from '@/lib/publicConfig';
 import {ArrowRight20Filled} from '@fluentui/react-icons';
@@ -32,6 +32,18 @@ export default function RegistrationPage() {
         people: Mahatma[];
         amount: number;
     } | null>(null);
+
+    // Scroll to payment details on step 2 transition
+    useEffect(() => {
+        if (step === 2) {
+            setTimeout(() => {
+                const element = document.getElementById('payment-details-section');
+                if (element) {
+                    element.scrollIntoView({behavior: 'smooth', block: 'start'});
+                }
+            }, 100);
+        }
+    }, [step]);
 
     // Real-time update handlers
     const handlePeopleChange = (updatedPeople: Mahatma[]) => {
@@ -101,7 +113,6 @@ export default function RegistrationPage() {
     const handleNextStep = () => {
         if (validateAttendees()) {
             setStep(2);
-            window.scrollTo({top: 0, behavior: 'smooth'});
         } else {
             // Scroll to first error field
             setTimeout(() => {
@@ -120,7 +131,6 @@ export default function RegistrationPage() {
         } else if (targetStep === 2) {
             if (validateAttendees()) {
                 setStep(2);
-                window.scrollTo({top: 0, behavior: 'smooth'});
             } else {
                 // Scroll to first error field
                 setTimeout(() => {
@@ -151,7 +161,6 @@ export default function RegistrationPage() {
 
         if (step === 1) {
             setStep(2);
-            window.scrollTo({top: 0, behavior: 'smooth'});
             return;
         }
 
@@ -280,7 +289,9 @@ export default function RegistrationPage() {
                             </div>
 
                             {/* Step 2: Payment Details */}
-                            <PaymentSection peopleCount={people.length}/>
+                            <div id="payment-details-section" className="scroll-mt-6">
+                                <PaymentSection peopleCount={people.length}/>
+                            </div>
 
                             {/* Step 3: Screenshot & Submissions */}
                             <UploadSection
