@@ -3,7 +3,7 @@
 
 export const publicConfig = {
     title: "Picnic with Aptputra Bhaio",
-    subtitle: "Special chance for all mahatmas of Bengaluru",
+    subtitle: "For all mahatmas of Bengaluru",
     badgeText: "Jai Satchitanand",
     picnicDate: "25th July (Saturday)",
     departureTime: "6:30 AM (tentative) from respective pickup points",
