@@ -98,7 +98,7 @@ export default function SubmissionDetailsModal({
             <div className="absolute inset-0" onClick={onClose}/>
 
             <div
-                className="relative bg-white rounded-3xl overflow-hidden shadow-2xl max-w-lg w-full max-h-[90vh] flex flex-col z-10 border border-stone-150 animate-scale-up">
+                className="relative bg-white rounded-3xl overflow-hidden shadow-2xl max-w-lg w-full min-h-137.5 max-h-[90vh] flex flex-col z-10 border border-stone-150 animate-scale-up">
                 {/* Header */}
                 <div className="flex items-center justify-between p-6 border-b border-stone-100 bg-stone-50/50">
                     <div>
@@ -192,7 +192,7 @@ export default function SubmissionDetailsModal({
                 Fare: ₹{publicConfig.picnicFare}/person
               </span>
                         </div>
-                        <div className="space-y-2 max-h-45 overflow-y-auto pr-1">
+                        <div className="space-y-2 max-h-80 overflow-y-auto pr-1">
                             {submission.people.map((person, idx) => (
                                 <div
                                     key={idx}
