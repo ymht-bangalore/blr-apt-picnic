@@ -56,8 +56,12 @@ export default function RegistrationPage() {
             const errorRow: { name?: string; mobile?: string } = {};
 
             // Name validation
-            if (!person.name.trim()) {
+            const cleanName = person.name.trim();
+            if (!cleanName) {
                 errorRow.name = 'Please enter a name.';
+                isValid = false;
+            } else if (!/^[a-zA-Z\s]+$/.test(cleanName)) {
+                errorRow.name = 'Name should only contain alphabets and spaces.';
                 isValid = false;
             }
 
@@ -172,7 +176,7 @@ export default function RegistrationPage() {
                 setSubmissionResult({
                     registrationId: result.registrationId,
                     isDemo: result.isDemo,
-                    people: [...people],
+                    people: result.people || [...people],
                     amount
                 });
             } else {

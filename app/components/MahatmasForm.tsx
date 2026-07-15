@@ -10,6 +10,17 @@ interface MahatmasFormProps {
     errors: Array<{ name?: string; mobile?: string }>;
 }
 
+const toTitleCase = (str: string): string => {
+    if (!str.trim()) return '';
+    return str
+        .trim()
+        .replace(/\s+/g, ' ')
+        .toLowerCase()
+        .split(' ')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
+};
+
 export default function MahatmasForm({people, onChange, errors}: MahatmasFormProps) {
     const lastItemRef = useRef<HTMLInputElement>(null);
 
@@ -38,7 +49,23 @@ export default function MahatmasForm({people, onChange, errors}: MahatmasFormPro
                     const cleanValue = value.replace(/\D/g, '').slice(0, 10);
                     return {...person, [field]: cleanValue};
                 }
+                if (field === 'name') {
+                    // Only allow alphabets (a-z, A-Z) and spaces
+                    const cleanValue = value.replace(/[^a-zA-Z\s]/g, '');
+                    return {...person, [field]: cleanValue};
+                }
                 return {...person, [field]: value};
+            }
+            return person;
+        });
+        onChange(updated);
+    };
+
+    const handleNameBlur = (index: number, value: string) => {
+        const titleCaseValue = toTitleCase(value);
+        const updated = people.map((person, idx) => {
+            if (idx === index) {
+                return {...person, name: titleCaseValue};
             }
             return person;
         });
@@ -92,7 +119,7 @@ export default function MahatmasForm({people, onChange, errors}: MahatmasFormPro
                                 <div>
                                     <label htmlFor={`name-${index}`}
                                            className="block text-sm font-semibold text-stone-800 mb-1.5">
-                                        Full Name
+                                        Full Name <span className="text-red-500 font-bold">*</span>
                                     </label>
                                     <div className="relative">
                                         <div
@@ -106,6 +133,7 @@ export default function MahatmasForm({people, onChange, errors}: MahatmasFormPro
                                             name={`name-${index}`}
                                             value={person.name}
                                             onChange={(e) => handleFieldChange(index, 'name', e.target.value)}
+                                            onBlur={(e) => handleNameBlur(index, e.target.value)}
                                             placeholder="e.g. Ramesh Patel"
                                             className={`w-full pl-10 pr-10 py-2.5 rounded-lg border bg-white text-stone-900 placeholder-stone-500 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all ${
                                                 rowError.name ? 'border-red-400 focus:border-red-500 focus:ring-red-500/20' : 'border-stone-300'
@@ -132,8 +160,11 @@ export default function MahatmasForm({people, onChange, errors}: MahatmasFormPro
                                 <div>
                                     <label htmlFor={`mobile-${index}`}
                                            className="block text-sm font-semibold text-stone-800 mb-1.5">
-                                        Mobile Number {index > 0 &&
-                                        <span className="text-stone-500 font-normal text-xs">(Optional)</span>}
+                                        Mobile Number {index === 0 ? (
+                                            <span className="text-red-500 font-bold">*</span>
+                                        ) : (
+                                            <span className="text-stone-500 font-normal text-xs">(Optional)</span>
+                                        )}
                                     </label>
                                     <div className="relative">
                                         <div

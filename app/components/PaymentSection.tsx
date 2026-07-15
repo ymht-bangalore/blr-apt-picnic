@@ -35,12 +35,12 @@ export default function PaymentSection({peopleCount}: PaymentSectionProps) {
 
     return (
         <div className="bg-white rounded-2xl shadow-sm border border-stone-150 p-6 sm:p-8 mb-6">
-            <div className="border-b border-stone-100 pb-4 mb-6">
+            <div className="xborder-b xborder-stone-100 xpb-4 mb-6">
                 <h2 className="text-xl font-bold text-stone-900 flex items-center gap-2">
                     <QrCode24Regular className="text-primary"/>
                     Payment Details
                 </h2>
-                <p className="text-sm text-stone-655 mt-1">Pay securely via any UPI app</p>
+                {/*<p className="text-sm text-stone-655 mt-1">Pay securely via any UPI app</p>*/}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">

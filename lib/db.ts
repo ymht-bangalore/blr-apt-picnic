@@ -10,7 +10,19 @@ export interface RegistrationResult {
     registrationId?: string;
     isDemo: boolean;
     error?: string;
+    people?: Mahatma[];
 }
+
+const toTitleCase = (str: string): string => {
+    if (!str.trim()) return '';
+    return str
+        .trim()
+        .replace(/\s+/g, ' ')
+        .toLowerCase()
+        .split(' ')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
+};
 
 /**
  * Registers a list of Mahatmas for the picnic, uploads the payment screenshot,
@@ -27,10 +39,19 @@ export async function registerMahatmas(
         return {success: false, isDemo: !isSupabaseConfigured, error: 'Please enter at least one person.'};
     }
 
+    const processedPeople: Mahatma[] = [];
     for (let i = 0; i < people.length; i++) {
         const person = people[i];
-        if (!person.name.trim()) {
+        const cleanName = person.name.trim();
+        if (!cleanName) {
             return {success: false, isDemo: !isSupabaseConfigured, error: 'All names must be filled out.'};
+        }
+        if (!/^[a-zA-Z\s]+$/.test(cleanName)) {
+            return {
+                success: false,
+                isDemo: !isSupabaseConfigured,
+                error: `Invalid name "${person.name}". Names must only contain alphabets and spaces.`
+            };
         }
         const cleanMobile = person.mobile.trim();
         if (i === 0) {
@@ -50,6 +71,11 @@ export async function registerMahatmas(
                 };
             }
         }
+
+        processedPeople.push({
+            name: toTitleCase(cleanName),
+            mobile: cleanMobile
+        });
     }
 
     if (!screenshotFile) {
@@ -100,7 +126,7 @@ export async function registerMahatmas(
                 .insert([
                     {
                         id: registrationId,
-                        people,
+                        people: processedPeople,
                         amount,
                         screenshot_url: publicUrl,
                         status: 'pending'
@@ -119,7 +145,8 @@ export async function registerMahatmas(
             return {
                 success: true,
                 isDemo: false,
-                registrationId
+                registrationId,
+                people: processedPeople
             };
 
         } catch (e: any) {
@@ -147,7 +174,7 @@ export async function registerMahatmas(
         const newRecord = {
             id: mockId,
             created_at: new Date().toISOString(),
-            people,
+            people: processedPeople,
             amount,
             screenshot_url: mockScreenshotUrl,
             status: 'pending'
@@ -159,7 +186,8 @@ export async function registerMahatmas(
         return {
             success: true,
             isDemo: true,
-            registrationId: mockId
+            registrationId: mockId,
+            people: processedPeople
         };
     } catch (e: any) {
         return {
