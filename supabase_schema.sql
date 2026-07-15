@@ -1,6 +1,35 @@
 -- BLR Picnic Registration Database Schema
 -- Run this in your Supabase SQL Editor (https://supabase.com)
 
+-- =========================================================================
+-- DEBUG / CLEANUP STEP: Run this block to clean up any conflicting policies
+-- =========================================================================
+DO
+$$
+DECLARE
+pol record;
+BEGIN
+    -- Drop all existing policies on public.registrations table
+FOR pol IN
+SELECT policyname
+FROM pg_policies
+WHERE schemaname = 'public'
+  AND tablename = 'registrations' LOOP
+        EXECUTE format('DROP POLICY %I ON public.registrations', pol.policyname);
+END LOOP;
+
+    -- Drop all existing custom policies on storage.objects for the screenshots bucket
+FOR pol IN
+SELECT policyname
+FROM pg_policies
+WHERE schemaname = 'storage'
+  AND tablename = 'objects'
+  AND policyname LIKE '%screenshots%' LOOP
+        EXECUTE format('DROP POLICY %I ON storage.objects', pol.policyname);
+END LOOP;
+END $$;
+
+
 -- 1. Create the registrations table
 CREATE TABLE IF NOT EXISTS public.registrations
 (
@@ -15,7 +44,6 @@ CREATE TABLE IF NOT EXISTS public.registrations
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
     people JSONB NOT NULL, -- Stores array of objects: [{"name": "Mahatma Name", "mobile": "9876543210"}]
     amount INTEGER NOT NULL, -- Total calculated amount (₹100 * number of people)
-    transaction_id TEXT, -- Optional UPI reference / transaction ID
     screenshot_url TEXT NOT NULL, -- URL of the uploaded screenshot
     status TEXT DEFAULT 'pending'::text NOT NULL -- pending, verified, cancelled
     );
@@ -24,12 +52,11 @@ CREATE TABLE IF NOT EXISTS public.registrations
 ALTER TABLE public.registrations ENABLE ROW LEVEL SECURITY;
 
 -- 2. Configure RLS Policies for registrations table
--- Allow anonymous users to register (insert only)
+-- Allow all roles (anonymous, authenticated, etc.) to register (insert only)
 CREATE
 POLICY "Allow public insert to registrations"
 ON public.registrations 
 FOR INSERT 
-TO anon 
 WITH CHECK (true);
 
 -- Restrict read/write to authenticated admins only (protect Mahatma privacy)
@@ -59,12 +86,11 @@ INSERT INTO storage.buckets (id, name, public)
 VALUES ('screenshots', 'screenshots', true) ON CONFLICT (id) DO NOTHING;
 
 -- Storage Security Policies for 'screenshots' bucket
--- Allow public/anonymous uploads
+-- Allow public uploads (any role)
 CREATE
 POLICY "Allow public upload to screenshots"
 ON storage.objects
 FOR INSERT
-TO anon
 WITH CHECK (bucket_id = 'screenshots');
 
 -- Allow public read of screenshots (so admin and app can view them)
@@ -73,5 +99,4 @@ POLICY "Allow public read of screenshots"
 ON storage.objects
 FOR
 SELECT
-    TO anon
     USING (bucket_id = 'screenshots');

@@ -53,8 +53,7 @@ export async function registerMahatmas(
                 .substring(0, screenshotFile.name.lastIndexOf('.'))
                 .replace(/[^a-zA-Z0-9]/g, '_');
 
-            const fileName = `${Date.now()}_${Math.random().toString(36).substring(2, 11)}_${cleanFileName}.${fileExt}`;
-            const filePath = `screenshots/${fileName}`;
+            const filePath = `${Date.now()}_${Math.random().toString(36).substring(2, 11)}_${cleanFileName}.${fileExt}`;
 
             const {data: uploadData, error: uploadError} = await supabase.storage
                 .from('screenshots')
@@ -77,19 +76,24 @@ export async function registerMahatmas(
                 .from('screenshots')
                 .getPublicUrl(filePath);
 
-            // 3. Insert into registrations table (setting transaction_id to null)
-            const {data: insertData, error: insertError} = await supabase
+            // Generate registration ID client-side to avoid calling .select('id'),
+            // which requires SELECT permission under Row-Level Security (RLS) policies.
+            const registrationId = typeof crypto !== 'undefined' && crypto.randomUUID
+                ? crypto.randomUUID()
+                : `${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
+
+            // 3. Insert into registrations table
+            const {error: insertError} = await supabase
                 .from('registrations')
                 .insert([
                     {
+                        id: registrationId,
                         people,
                         amount,
-                        transaction_id: null,
                         screenshot_url: publicUrl,
                         status: 'pending'
                     }
-                ])
-                .select('id');
+                ]);
 
             if (insertError) {
                 console.error('Database Insert Error:', insertError);
@@ -103,7 +107,7 @@ export async function registerMahatmas(
             return {
                 success: true,
                 isDemo: false,
-                registrationId: insertData && insertData[0] ? insertData[0].id : 'completed'
+                registrationId
             };
 
         } catch (e: any) {
@@ -133,7 +137,6 @@ export async function registerMahatmas(
             created_at: new Date().toISOString(),
             people,
             amount,
-            transaction_id: null,
             screenshot_url: mockScreenshotUrl,
             status: 'pending'
         };

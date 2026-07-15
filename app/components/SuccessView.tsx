@@ -52,7 +52,8 @@ export default function SuccessView({
                     Registration Submitted
                 </h1>
                 <p className="text-sm text-stone-700 mt-2 max-w-md">
-                    Thank you for registering. Your details have been recorded and are pending review.
+                    Thank you for registering. Your details have been recorded and we will add all members to the
+                    WhatsApp group soon.
                 </p>
 
                 {isDemo && (
@@ -128,10 +129,10 @@ export default function SuccessView({
                     className="flex gap-2.5 bg-sky-50/50 border border-sky-200 text-sky-900 p-4 rounded-xl text-xs sm:text-sm leading-relaxed print:hidden">
                     <Info16Regular className="text-sky-700 shrink-0 mt-0.5"/>
                     <div>
-                        <p className="font-bold">Next Steps & Verification</p>
+                        <p className="font-bold">Next Steps</p>
                         <p className="mt-0.5 text-stone-700">
-                            Our coordinators will verify the payment screenshot. Once verified, a confirmation
-                            SMS/WhatsApp message will be sent. Please keep this receipt handy.
+                            The sevarthis will verify the payment screenshot. Once verified, we will add all members to
+                            the WhatsApp group. <b>Please keep this receipt handy.</b>
                         </p>
                     </div>
                 </div>
@@ -141,7 +142,7 @@ export default function SuccessView({
                     <button
                         type="button"
                         onClick={handlePrint}
-                        className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl border border-stone-200 text-stone-700 font-semibold bg-white hover:bg-stone-50 hover:text-stone-900 shadow-sm transition-all focus:ring-2 focus:ring-stone-200"
+                        className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl border border-stone-200 text-stone-700 font-semibold bg-white hover:bg-stone-50 hover:text-stone-900 shadow-sm transition-all focus:ring-2 focus:ring-stone-200 cursor-pointer"
                     >
                         <Print20Regular className="shrink-0"/>
                         Print Receipt
@@ -150,7 +151,7 @@ export default function SuccessView({
                     <button
                         type="button"
                         onClick={onReset}
-                        className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-primary text-white font-semibold hover:bg-primary-hover shadow-sm hover:shadow transition-all focus:ring-2 focus:ring-primary/20"
+                        className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-primary text-white font-semibold hover:bg-primary-hover shadow-sm hover:shadow transition-all focus:ring-2 focus:ring-primary/20 cursor-pointer"
                     >
                         <ArrowCounterclockwise20Regular className="shrink-0"/>
                         Register More People
