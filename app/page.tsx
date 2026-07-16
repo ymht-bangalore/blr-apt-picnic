@@ -613,10 +613,8 @@ export default function RegistrationPage() {
             <footer className="bg-stone-100 border-t border-stone-200 py-8 px-4 text-center mt-12 print:hidden">
                 <p className="text-sm font-semibold text-stone-700">Jai Satchitanand</p>
                 <p className="text-xs text-stone-500 mt-1 max-w-md mx-auto leading-relaxed">
-                    This registration form is dedicated for the picnic with Aptputra bhaio for all mahatmas of Bengaluru
-                    center.
-                    For registration assistance or general inquiries, please contact on the details mentioned at the
-                    top.
+                    This registration form is dedicated for the picnic with Aptaputra bhaio for all mahatmas of
+                    Bengaluru center.
                 </p>
             </footer>
         </div>

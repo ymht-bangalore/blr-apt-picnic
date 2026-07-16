@@ -19,14 +19,14 @@ export const metadata: Metadata = {
         default: "Picnic Registration Confirmation | Bangalore",
         template: "%s | BLR Picnic"
     },
-    description: "Confirm your registration for the picnic with Aptputra bhaio by paying the registration amount.",
+    description: "Confirm your registration for the picnic with Aptaputra bhaio by paying the registration amount.",
     authors: [{name: "Divyansh Gemini"}],
     creator: "Divyansh Gemini",
     openGraph: {
         type: "website",
         locale: "en_US",
         title: "Picnic Registration Confirmation | Bangalore",
-        description: "Confirm your registration for the picnic with Aptputra bhaio by paying the registration amount.",
+        description: "Confirm your registration for the picnic with Aptaputra bhaio by paying the registration amount.",
         siteName: "Craft",
         images: [
             {
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     twitter: {
         card: "summary_large_image",
         title: "Picnic Registration Confirmation | Bangalore",
-        description: "Confirm your registration for the picnic with Aptputra bhaio by paying the registration amount.",
+        description: "Confirm your registration for the picnic with Aptaputra bhaio by paying the registration amount.",
         images: ["/og-image.jpg"],
     },
     appleWebApp: {
@@ -50,9 +50,7 @@ export const metadata: Metadata = {
     },
 };
 
-export default function RootLayout({
-                                       children,
-                                   }: Readonly<{
+export default function RootLayout({children}: Readonly<{
     children: React.ReactNode;
 }>) {
     // Vercel Speed Insights

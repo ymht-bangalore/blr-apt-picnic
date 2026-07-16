@@ -1,7 +1,7 @@
 # BLR Picnic Registration Portal
 
 A modern, highly responsive, and full-featured web application designed for Bengaluru Mahatmas to confirm their
-registration for the upcoming picnic with Aptputra Bhaiyo. The system provides a seamless step-by-step registration
+registration for the upcoming picnic with Aptaputra Bhaiyo. The system provides a seamless step-by-step registration
 flow, dynamic UPI/QR payment generation, receipt upload, and a robust administrative control panel.
 
 ---

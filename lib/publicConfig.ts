@@ -2,7 +2,7 @@
 // Editable parameters for event dates, routes, fare, and main text headings.
 
 export const publicConfig = {
-    title: "Picnic with Aptputra Bhaio",
+    title: "Picnic with Aptaputra Bhaio",
     subtitle: "For all mahatmas of Bengaluru",
     badgeText: "Jai Satchitanand",
     picnicDate: "25th July (Saturday)",
