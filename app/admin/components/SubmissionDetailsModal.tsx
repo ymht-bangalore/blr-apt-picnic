@@ -26,6 +26,7 @@ interface Submission {
     created_at: string;
     people: Mahatma[];
     amount: number;
+    pickup_point?: string;
     screenshot_url: string;
     status: string;
 }
@@ -136,6 +137,18 @@ export default function SubmissionDetailsModal({
                         <div className="space-y-1">
                             <span className="text-stone-500 text-xs font-semibold uppercase tracking-wider block">Current Status</span>
                             <div>{getStatusBadge(submission.status)}</div>
+                        </div>
+                    </div>
+
+                    {/* Selected Boarding Point Card */}
+                    <div
+                        className="bg-[#FDF7F0] border border-accent/20 p-4 rounded-2xl text-sm flex items-center justify-between gap-3 shadow-sm">
+                        <div className="space-y-1">
+                            <span className="text-stone-600 text-xs font-bold uppercase tracking-wider block">Boarding / Pickup Point</span>
+                            <div
+                                className="flex items-center gap-1.5 text-stone-900 font-extrabold text-sm sm:text-base">
+                                📍 {submission.pickup_point || 'Self'}
+                            </div>
                         </div>
                     </div>
 

@@ -32,6 +32,7 @@ interface Submission {
     created_at: string;
     people: Mahatma[];
     amount: number;
+    pickup_point?: string;
     screenshot_url: string;
     status: string;
 }
@@ -209,7 +210,7 @@ export default function AdminDashboardPage() {
 
         // 1. Compile CSV rows with all attendees
         const rows: string[][] = [
-            ['S.No', 'Attendee Name', 'Attendee Age Group', 'Attendee Mobile', 'Primary Contact Name', 'Primary Contact Mobile', 'Fare Paid (₹)', 'Verification Status', 'Submission Date']
+            ['S.No', 'Attendee Name', 'Attendee Age Group', 'Attendee Mobile', 'Pickup Point', 'Primary Contact Name', 'Primary Contact Mobile', 'Fare Paid (₹)', 'Verification Status', 'Submission Date']
         ];
 
         let counter = 1;
@@ -223,6 +224,7 @@ export default function AdminDashboardPage() {
                 month: '2-digit',
                 year: 'numeric'
             });
+            const pickupPoint = sub.pickup_point || 'Self';
 
             sub.people.forEach(person => {
                 const ageGroupText = person.ageGroup === 'less-8'
@@ -234,6 +236,7 @@ export default function AdminDashboardPage() {
                     person.name,
                     ageGroupText,
                     person.mobile || '',
+                    pickupPoint,
                     primaryContact,
                     primaryMobile,
                     fare.toString(),
@@ -505,6 +508,12 @@ export default function AdminDashboardPage() {
                                             <td className="py-4 px-6">
                                                 <div className="font-semibold text-stone-900">{person1.name}</div>
                                                 <div className="text-xs text-stone-400 mt-0.5">{person1.mobile}</div>
+                                                <div className="mt-1.5 flex flex-wrap">
+                                                    <span
+                                                        className="inline-flex items-center gap-1 text-[10px] font-bold bg-[#FDF1ED] text-primary px-2 py-0.5 rounded border border-primary/20 shadow-sm">
+                                                        📍 {sub.pickup_point || 'Self'}
+                                                    </span>
+                                                </div>
                                             </td>
                                             <td className="py-4 px-6 text-center">
                           <span

@@ -31,6 +31,10 @@ END $$;
 
 
 -- 1. Create the registrations table
+-- MIGRATION NOTE FOR EXISTING TABLES:
+-- If your registrations table is already created, run the following SQL command:
+-- ALTER TABLE public.registrations ADD COLUMN IF NOT EXISTS pickup_point TEXT NOT NULL DEFAULT 'Self';
+
 CREATE TABLE IF NOT EXISTS public.registrations
 (
     id
@@ -44,6 +48,7 @@ CREATE TABLE IF NOT EXISTS public.registrations
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
     people JSONB NOT NULL, -- Stores array of objects: [{"name": "Mahatma Name", "mobile": "9876543210"}]
     amount INTEGER NOT NULL, -- Total calculated amount (₹100 * number of people)
+    pickup_point TEXT NOT NULL DEFAULT 'Self', -- Boarding point for bus or Self
     screenshot_url TEXT NOT NULL, -- URL of the uploaded screenshot
     status TEXT DEFAULT 'pending'::text NOT NULL -- pending, verified, cancelled
     );

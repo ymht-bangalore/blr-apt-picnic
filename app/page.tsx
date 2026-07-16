@@ -3,7 +3,7 @@
 import React, {useState, useEffect} from 'react';
 import {registerMahatmas, Mahatma} from '@/lib/db';
 import {publicConfig} from '@/lib/publicConfig';
-import {ArrowRight20Filled} from '@fluentui/react-icons';
+import {ArrowRight20Filled, Location20Filled} from '@fluentui/react-icons';
 
 // Import Components
 import RegistrationHeader from './components/RegistrationHeader';
@@ -12,10 +12,12 @@ import PaymentSection from './components/PaymentSection';
 import UploadSection from './components/UploadSection';
 import SuccessView from './components/SuccessView';
 import Stepper from './components/Stepper';
+import PickupPointSelector from './components/PickupPointSelector';
 
 export default function RegistrationPage() {
     // Form States
     const [people, setPeople] = useState<Mahatma[]>([{name: '', mobile: '', ageGroup: ''}]);
+    const [pickupPoint, setPickupPoint] = useState<string>('');
     const [screenshot, setScreenshot] = useState<File | null>(null);
     const [step, setStep] = useState<1 | 2>(1);
     const [isReviewing, setIsReviewing] = useState<boolean>(false);
@@ -97,6 +99,10 @@ export default function RegistrationPage() {
                     console.error('Failed to parse saved form details', e);
                 }
             }
+            const savedPickup = sessionStorage.getItem('blr_picnic_pickup_point');
+            if (savedPickup) {
+                setPickupPoint(savedPickup);
+            }
         }
     }, []);
 
@@ -107,8 +113,16 @@ export default function RegistrationPage() {
         }
     }, [people]);
 
+    // Save pickup point to sessionStorage when changes occur
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            sessionStorage.setItem('blr_picnic_pickup_point', pickupPoint);
+        }
+    }, [pickupPoint]);
+
     // Validation States
     const [errors, setErrors] = useState<Array<{ name?: string; mobile?: string; ageGroup?: string }>>([]);
+    const [pickupPointError, setPickupPointError] = useState<string>('');
     const [screenshotError, setScreenshotError] = useState<string>('');
     const [generalError, setGeneralError] = useState<string>('');
 
@@ -119,6 +133,7 @@ export default function RegistrationPage() {
         isDemo: boolean;
         people: Mahatma[];
         amount: number;
+        pickupPoint: string;
     } | null>(null);
 
     // Scroll to payment details on step 2 transition
@@ -148,6 +163,15 @@ export default function RegistrationPage() {
         if (file) {
             setScreenshotError('');
         }
+    };
+
+    const validatePickupPoint = (): boolean => {
+        if (!pickupPoint || !pickupPoint.trim()) {
+            setPickupPointError('Please select a pickup point.');
+            return false;
+        }
+        setPickupPointError('');
+        return true;
     };
 
     const validateAttendees = (): boolean => {
@@ -205,7 +229,9 @@ export default function RegistrationPage() {
         }
     };
     const handleNextStep = () => {
-        if (validateAttendees()) {
+        const isPickupValid = validatePickupPoint();
+        const isAttendeesValid = validateAttendees();
+        if (isPickupValid && isAttendeesValid) {
             navigateTo(1, true, 'push');
             setTimeout(() => {
                 const element = document.getElementById('registration-form');
@@ -216,7 +242,7 @@ export default function RegistrationPage() {
         } else {
             // Scroll to first error field
             setTimeout(() => {
-                const firstErrorEl = document.querySelector('.border-red-400');
+                const firstErrorEl = document.querySelector('.border-red-400') || document.querySelector('.border-red-500');
                 if (firstErrorEl) {
                     firstErrorEl.scrollIntoView({behavior: 'smooth', block: 'center'});
                 }
@@ -230,7 +256,9 @@ export default function RegistrationPage() {
                 handleBack();
             }
         } else if (targetStep === 2) {
-            if (validateAttendees()) {
+            const isPickupValid = validatePickupPoint();
+            const isAttendeesValid = validateAttendees();
+            if (isPickupValid && isAttendeesValid) {
                 if (!isReviewing) {
                     navigateTo(1, true, 'push');
                     setTimeout(() => {
@@ -246,7 +274,7 @@ export default function RegistrationPage() {
             } else {
                 // Scroll to first error field
                 setTimeout(() => {
-                    const firstErrorEl = document.querySelector('.border-red-400');
+                    const firstErrorEl = document.querySelector('.border-red-400') || document.querySelector('.border-red-500');
                     if (firstErrorEl) {
                         firstErrorEl.scrollIntoView({behavior: 'smooth', block: 'center'});
                     }
@@ -259,11 +287,12 @@ export default function RegistrationPage() {
         e.preventDefault();
         setGeneralError('');
 
+        const isPickupValid = validatePickupPoint();
         const isAttendeesValid = validateAttendees();
-        if (!isAttendeesValid) {
+        if (!isPickupValid || !isAttendeesValid) {
             setStep(1);
             setTimeout(() => {
-                const firstErrorEl = document.querySelector('.border-red-400');
+                const firstErrorEl = document.querySelector('.border-red-400') || document.querySelector('.border-red-500');
                 if (firstErrorEl) {
                     firstErrorEl.scrollIntoView({behavior: 'smooth', block: 'center'});
                 }
@@ -291,15 +320,30 @@ export default function RegistrationPage() {
         const amount = totalAmount;
 
         try {
-            const result = await registerMahatmas(people, amount, screenshot);
+            const result = await registerMahatmas(people, amount, pickupPoint, screenshot);
 
             if (result.success && result.registrationId) {
                 setSubmissionResult({
                     registrationId: result.registrationId,
                     isDemo: result.isDemo,
                     people: result.people || [...people],
-                    amount
+                    amount,
+                    pickupPoint: pickupPoint
                 });
+
+                // Clear sessionStorage
+                if (typeof window !== 'undefined') {
+                    sessionStorage.removeItem('blr_picnic_registration_form');
+                    sessionStorage.removeItem('blr_picnic_pickup_point');
+                }
+
+                // Reset form states so that they are empty if the user revisits
+                setPeople([{name: '', mobile: '', ageGroup: ''}]);
+                setPickupPoint('');
+                setScreenshot(null);
+                setErrors([]);
+                setPickupPointError('');
+                setScreenshotError('');
             } else {
                 setGeneralError(result.error || 'Registration failed. Please try again.');
             }
@@ -312,13 +356,16 @@ export default function RegistrationPage() {
 
     const handleReset = () => {
         setPeople([{name: '', mobile: '', ageGroup: ''}]);
+        setPickupPoint('');
         setScreenshot(null);
         setErrors([]);
+        setPickupPointError('');
         setScreenshotError('');
         setGeneralError('');
         setSubmissionResult(null);
         if (typeof window !== 'undefined') {
             sessionStorage.removeItem('blr_picnic_registration_form');
+            sessionStorage.removeItem('blr_picnic_pickup_point');
         }
         navigateTo(1, false, 'replace');
     };
@@ -331,6 +378,7 @@ export default function RegistrationPage() {
                     registrationId={submissionResult.registrationId}
                     people={submissionResult.people}
                     amount={submissionResult.amount}
+                    pickupPoint={submissionResult.pickupPoint}
                     isDemo={submissionResult.isDemo}
                     onReset={handleReset}
                 />
@@ -358,6 +406,22 @@ export default function RegistrationPage() {
                                             Details</h2>
                                         <p className="text-sm text-stone-600 mt-1">Please review the attendee details
                                             below before proceeding to payment.</p>
+                                    </div>
+
+                                    {/* Selected Pickup Point Summary */}
+                                    <div
+                                        className="mb-6 p-4 rounded-xl border border-primary/20 bg-primary-light flex items-center justify-between gap-3 animate-scale-up">
+                                        <div className="flex items-center gap-3">
+                                            <div
+                                                className="w-10 h-10 rounded-xl bg-white border border-primary/10 flex items-center justify-center text-primary shrink-0 shadow-sm">
+                                                <Location20Filled className="w-5 h-5"/>
+                                            </div>
+                                            <div>
+                                                <p className="text-xs text-primary font-bold uppercase tracking-wider">Selected
+                                                    Pickup Point</p>
+                                                <p className="text-sm font-extrabold text-stone-900">{pickupPoint}</p>
+                                            </div>
+                                        </div>
                                     </div>
 
                                     {/* Attendees List cards */}
@@ -443,6 +507,18 @@ export default function RegistrationPage() {
                             </>
                         ) : (
                             <>
+                                {/* Pickup Point Selector - Mandatory, At the start */}
+                                <PickupPointSelector
+                                    value={pickupPoint}
+                                    onChange={(val) => {
+                                        setPickupPoint(val);
+                                        if (pickupPointError) {
+                                            setPickupPointError('');
+                                        }
+                                    }}
+                                    error={pickupPointError}
+                                />
+
                                 {/* Step 1: Attendee Details Form */}
                                 <MahatmasForm
                                     people={people}

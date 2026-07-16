@@ -7,7 +7,8 @@ import {
     People20Regular,
     Print20Regular,
     ArrowCounterclockwise20Regular,
-    Info16Regular
+    Info16Regular,
+    Location20Regular
 } from '@fluentui/react-icons';
 import {Mahatma} from '@/lib/db';
 import {publicConfig} from '@/lib/publicConfig';
@@ -16,6 +17,7 @@ interface SuccessViewProps {
     registrationId: string;
     people: Mahatma[];
     amount: number;
+    pickupPoint: string;
     isDemo: boolean;
     onReset: () => void;
 }
@@ -24,6 +26,7 @@ export default function SuccessView({
                                         registrationId,
                                         people,
                                         amount,
+                                        pickupPoint,
                                         isDemo,
                                         onReset
                                     }: SuccessViewProps) {
@@ -108,6 +111,11 @@ export default function SuccessView({
                     <div className="flex items-center gap-2.5 text-stone-850 text-sm">
                         <People20Regular className="text-secondary shrink-0"/>
                         <span>{publicConfig.subtitle}</span>
+                    </div>
+                    <div
+                        className="flex items-center gap-2.5 text-stone-850 text-sm border-t border-dashed border-stone-250 pt-2">
+                        <Location20Regular className="text-accent shrink-0"/>
+                        <span>Pickup Point: <strong>{pickupPoint}</strong></span>
                     </div>
                 </div>
 

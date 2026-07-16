@@ -33,11 +33,15 @@ const toTitleCase = (str: string): string => {
 export async function registerMahatmas(
     people: Mahatma[],
     amount: number,
+    pickupPoint: string,
     screenshotFile: File | null
 ): Promise<RegistrationResult> {
     // Validate input parameters
     if (people.length === 0) {
         return {success: false, isDemo: !isSupabaseConfigured, error: 'Please enter at least one person.'};
+    }
+    if (!pickupPoint || !pickupPoint.trim()) {
+        return {success: false, isDemo: !isSupabaseConfigured, error: 'Please select a pickup point.'};
     }
 
     const processedPeople: Mahatma[] = [];
@@ -130,6 +134,7 @@ export async function registerMahatmas(
                         id: registrationId,
                         people: processedPeople,
                         amount,
+                        pickup_point: pickupPoint,
                         screenshot_url: publicUrl,
                         status: 'pending'
                     }
@@ -178,6 +183,7 @@ export async function registerMahatmas(
             created_at: new Date().toISOString(),
             people: processedPeople,
             amount,
+            pickup_point: pickupPoint,
             screenshot_url: mockScreenshotUrl,
             status: 'pending'
         };
