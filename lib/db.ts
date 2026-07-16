@@ -3,7 +3,7 @@ import {supabase, isSupabaseConfigured} from './supabase';
 export interface Mahatma {
     name: string;
     mobile: string;
-    ageGroup: 'less-8' | 'more-8';
+    ageGroup: 'less-8' | 'more-8' | '';
 }
 
 export interface RegistrationResult {

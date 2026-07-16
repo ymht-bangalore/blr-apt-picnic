@@ -226,8 +226,8 @@ export default function AdminDashboardPage() {
 
             sub.people.forEach(person => {
                 const ageGroupText = person.ageGroup === 'less-8'
-                    ? 'Less than 8'
-                    : '8 and above';
+                    ? 'Age less than 8'
+                    : 'Age 8 and above';
 
                 rows.push([
                     counter.toString(),

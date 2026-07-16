@@ -8,7 +8,7 @@ import {publicConfig} from '@/lib/publicConfig';
 interface MahatmasFormProps {
     people: Mahatma[];
     onChange: (updatedPeople: Mahatma[]) => void;
-    errors: Array<{ name?: string; mobile?: string }>;
+    errors: Array<{ name?: string; mobile?: string; ageGroup?: string }>;
 }
 
 const toTitleCase = (str: string): string => {
@@ -33,7 +33,7 @@ export default function MahatmasForm({people, onChange, errors}: MahatmasFormPro
     }, [people.length]);
 
     const addPerson = () => {
-        onChange([...people, {name: '', mobile: '', ageGroup: 'more-8'}]);
+        onChange([...people, {name: '', mobile: '', ageGroup: ''}]);
     };
 
     const removePerson = (index: number) => {
@@ -223,10 +223,12 @@ export default function MahatmasForm({people, onChange, errors}: MahatmasFormPro
                                             className={`flex flex-col items-center justify-center p-3 rounded-xl border text-center transition-all duration-150 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 ${
                                                 person.ageGroup === 'less-8'
                                                     ? 'bg-primary-light border-primary text-primary shadow-sm ring-1 ring-primary/30 font-bold'
-                                                    : 'bg-white border-stone-200 text-stone-600 hover:bg-stone-50/50 hover:border-stone-300'
+                                                    : `bg-white text-stone-600 hover:bg-stone-50/50 hover:border-stone-300 ${
+                                                        rowError.ageGroup ? 'border-red-400 focus:border-red-500 focus:ring-red-500/20' : 'border-stone-200'
+                                                    }`
                                             }`}
                                         >
-                                            <span className="text-sm block">Less than 8</span>
+                                            <span className="text-sm block font-medium">Age less than 8</span>
                                             <span
                                                 className="text-[10px] opacity-90 mt-0.5 font-semibold">Half Price (₹{Math.round(publicConfig.picnicFare / 2)})</span>
                                         </button>
@@ -238,16 +240,21 @@ export default function MahatmasForm({people, onChange, errors}: MahatmasFormPro
                                             aria-checked={person.ageGroup === 'more-8'}
                                             onClick={() => handleFieldChange(index, 'ageGroup', 'more-8')}
                                             className={`flex flex-col items-center justify-center p-3 rounded-xl border text-center transition-all duration-150 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 ${
-                                                person.ageGroup === 'more-8' || !person.ageGroup
+                                                person.ageGroup === 'more-8'
                                                     ? 'bg-primary-light border-primary text-primary shadow-sm ring-1 ring-primary/30 font-bold'
-                                                    : 'bg-white border-stone-200 text-stone-600 hover:bg-stone-50/50 hover:border-stone-300'
+                                                    : `bg-white text-stone-600 hover:bg-stone-50/50 hover:border-stone-300 ${
+                                                        rowError.ageGroup ? 'border-red-400 focus:border-red-500 focus:ring-red-500/20' : 'border-stone-200'
+                                                    }`
                                             }`}
                                         >
-                                            <span className="text-sm block">8 and above</span>
+                                            <span className="text-sm block font-medium">Age 8 and above</span>
                                             <span
                                                 className="text-[10px] opacity-90 mt-0.5 font-semibold">Full Price (₹{publicConfig.picnicFare})</span>
                                         </button>
                                     </div>
+                                    {rowError.ageGroup && (
+                                        <p className="mt-1 text-xs font-semibold text-red-650">{rowError.ageGroup}</p>
+                                    )}
                                 </div>
                             </div>
                         </div>

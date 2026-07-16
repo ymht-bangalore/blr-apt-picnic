@@ -15,7 +15,7 @@ import Stepper from './components/Stepper';
 
 export default function RegistrationPage() {
     // Form States
-    const [people, setPeople] = useState<Mahatma[]>([{name: '', mobile: '', ageGroup: 'more-8'}]);
+    const [people, setPeople] = useState<Mahatma[]>([{name: '', mobile: '', ageGroup: ''}]);
     const [screenshot, setScreenshot] = useState<File | null>(null);
     const [step, setStep] = useState<1 | 2>(1);
     const [isReviewing, setIsReviewing] = useState<boolean>(false);
@@ -23,14 +23,92 @@ export default function RegistrationPage() {
     const calculateTotalAmount = (peopleList: Mahatma[]) => {
         return peopleList.reduce((acc, person) => {
             if (person.ageGroup === 'less-8') return acc + Math.round(publicConfig.picnicFare / 2);
-            return acc + publicConfig.picnicFare;
+            if (person.ageGroup === 'more-8') return acc + publicConfig.picnicFare;
+            return acc;
         }, 0);
     };
 
     const totalAmount = calculateTotalAmount(people);
 
+    // Custom Navigation Helper with Browser History integration
+    const navigateTo = (targetStep: 1 | 2, targetIsReviewing: boolean, action: 'push' | 'replace' | 'none' = 'push') => {
+        setStep(targetStep);
+        setIsReviewing(targetIsReviewing);
+        if (typeof window !== 'undefined') {
+            if (action === 'push') {
+                window.history.pushState({step: targetStep, isReviewing: targetIsReviewing}, '');
+            } else if (action === 'replace') {
+                window.history.replaceState({step: targetStep, isReviewing: targetIsReviewing}, '');
+            }
+        }
+    };
+
+    const handleBack = () => {
+        if (typeof window !== 'undefined' && window.history.state) {
+            window.history.back();
+        } else {
+            // Fallback if history state isn't available
+            if (step === 2) {
+                setStep(1);
+                setIsReviewing(true);
+            } else if (isReviewing) {
+                setIsReviewing(false);
+            }
+        }
+    };
+
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            // Initialize history state on mount
+            window.history.replaceState({step: 1, isReviewing: false}, '');
+
+            const handlePopState = (event: PopStateEvent) => {
+                // Prevent Next.js router from intercepting our step transition, preventing page re-mount and state loss
+                event.stopImmediatePropagation();
+
+                if (event.state) {
+                    const {step: targetStep, isReviewing: targetIsReviewing} = event.state;
+                    setStep(targetStep);
+                    setIsReviewing(targetIsReviewing);
+                } else {
+                    setStep(1);
+                    setIsReviewing(false);
+                }
+            };
+
+            window.addEventListener('popstate', handlePopState, true);
+            return () => {
+                window.removeEventListener('popstate', handlePopState, true);
+            };
+        }
+    }, []);
+
+    // Load form data from sessionStorage on mount
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const saved = sessionStorage.getItem('blr_picnic_registration_form');
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        setPeople(parsed);
+                    }
+                } catch (e) {
+                    console.error('Failed to parse saved form details', e);
+                }
+            }
+        }
+    }, []);
+
+    // Save form data to sessionStorage when changes occur
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            sessionStorage.setItem('blr_picnic_registration_form', JSON.stringify(people));
+        }
+    }, [people]);
+
     // Validation States
-    const [errors, setErrors] = useState<Array<{ name?: string; mobile?: string }>>([]);
+    const [errors, setErrors] = useState<Array<{ name?: string; mobile?: string; ageGroup?: string }>>([]);
     const [screenshotError, setScreenshotError] = useState<string>('');
     const [generalError, setGeneralError] = useState<string>('');
 
@@ -75,7 +153,7 @@ export default function RegistrationPage() {
     const validateAttendees = (): boolean => {
         let isValid = true;
         const newErrors = people.map((person, index) => {
-            const errorRow: { name?: string; mobile?: string } = {};
+            const errorRow: { name?: string; mobile?: string; ageGroup?: string } = {};
 
             // Name validation
             const cleanName = person.name.trim();
@@ -104,6 +182,12 @@ export default function RegistrationPage() {
                 }
             }
 
+            // Age Group validation
+            if (!person.ageGroup) {
+                errorRow.ageGroup = 'Please select an age group.';
+                isValid = false;
+            }
+
             return errorRow;
         });
 
@@ -122,7 +206,7 @@ export default function RegistrationPage() {
     };
     const handleNextStep = () => {
         if (validateAttendees()) {
-            setIsReviewing(true);
+            navigateTo(1, true, 'push');
             setTimeout(() => {
                 const element = document.getElementById('registration-form');
                 if (element) {
@@ -142,13 +226,13 @@ export default function RegistrationPage() {
 
     const handleStepClick = (targetStep: 1 | 2) => {
         if (targetStep === 1) {
-            setStep(1);
-            window.scrollTo({top: 0, behavior: 'smooth'});
+            if (step === 2 || isReviewing) {
+                handleBack();
+            }
         } else if (targetStep === 2) {
             if (validateAttendees()) {
                 if (!isReviewing) {
-                    setIsReviewing(true);
-                    setStep(1);
+                    navigateTo(1, true, 'push');
                     setTimeout(() => {
                         const element = document.getElementById('registration-form');
                         if (element) {
@@ -156,7 +240,7 @@ export default function RegistrationPage() {
                         }
                     }, 100);
                 } else {
-                    setStep(2);
+                    navigateTo(2, true, 'push');
                     window.scrollTo({top: 0, behavior: 'smooth'});
                 }
             } else {
@@ -188,7 +272,7 @@ export default function RegistrationPage() {
         }
 
         if (step === 1) {
-            setStep(2);
+            navigateTo(2, true, 'push');
             return;
         }
 
@@ -227,14 +311,16 @@ export default function RegistrationPage() {
     };
 
     const handleReset = () => {
-        setPeople([{name: '', mobile: '', ageGroup: 'more-8'}]);
+        setPeople([{name: '', mobile: '', ageGroup: ''}]);
         setScreenshot(null);
         setErrors([]);
         setScreenshotError('');
         setGeneralError('');
         setSubmissionResult(null);
-        setStep(1);
-        setIsReviewing(false);
+        if (typeof window !== 'undefined') {
+            sessionStorage.removeItem('blr_picnic_registration_form');
+        }
+        navigateTo(1, false, 'replace');
     };
 
     // Success view display
@@ -278,8 +364,8 @@ export default function RegistrationPage() {
                                     <div className="space-y-3">
                                         {people.map((person, index) => {
                                             const ageLabel = person.ageGroup === 'less-8'
-                                                ? 'Under 8 (Half Price)'
-                                                : '8 and above (Full Price)';
+                                                ? 'Age less than 8 (Half Price)'
+                                                : 'Age 8 and above (Full Price)';
                                             const personFare = person.ageGroup === 'less-8'
                                                 ? Math.round(publicConfig.picnicFare / 2)
                                                 : publicConfig.picnicFare;
@@ -337,7 +423,7 @@ export default function RegistrationPage() {
                                 <div className="flex flex-col sm:flex-row gap-3 pt-2">
                                     <button
                                         type="button"
-                                        onClick={() => setIsReviewing(false)}
+                                        onClick={handleBack}
                                         className="flex-1 py-3.5 px-6 rounded-2xl bg-white hover:bg-stone-50 text-stone-750 font-bold text-sm border border-stone-200 shadow-sm transition-all active:scale-[0.98] cursor-pointer"
                                     >
                                         Edit Details
@@ -345,7 +431,7 @@ export default function RegistrationPage() {
                                     <button
                                         type="button"
                                         onClick={() => {
-                                            setStep(2);
+                                            navigateTo(2, true, 'push');
                                             window.scrollTo({top: 0, behavior: 'smooth'});
                                         }}
                                         className="flex-1 flex items-center justify-center gap-2 py-3.5 px-6 rounded-2xl bg-primary hover:bg-primary-hover text-white font-bold text-sm shadow-md transition-all active:scale-[0.98] cursor-pointer animate-pulse"
@@ -408,10 +494,7 @@ export default function RegistrationPage() {
                             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-2">
                                 <button
                                     type="button"
-                                    onClick={() => {
-                                        setStep(1);
-                                        window.scrollTo({top: 0, behavior: 'smooth'});
-                                    }}
+                                    onClick={handleBack}
                                     className="px-6 py-4 rounded-2xl border-2 border-stone-300 text-stone-700 font-bold text-base hover:bg-stone-50 active:scale-[0.98] cursor-pointer transition-all duration-150 text-center"
                                 >
                                     Back to Mahatma Details

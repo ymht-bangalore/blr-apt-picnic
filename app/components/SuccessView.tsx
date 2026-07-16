@@ -119,8 +119,8 @@ export default function SuccessView({
                     <div className="border border-stone-200 rounded-xl divide-y divide-stone-200 overflow-hidden">
                         {people.map((person, index) => {
                             const ageGroupLabel = person.ageGroup === 'less-8'
-                                ? 'Under 8 (Half Price)'
-                                : '8 and above (Full Price)';
+                                ? 'Age less than 8 (Half Price)'
+                                : 'Age 8 and above (Full Price)';
                             const attendeePrice = person.ageGroup === 'less-8'
                                 ? Math.round(publicConfig.picnicFare / 2)
                                 : publicConfig.picnicFare;

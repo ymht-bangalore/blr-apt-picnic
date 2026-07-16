@@ -219,7 +219,7 @@ export default function SubmissionDetailsModal({
                                                 <span className="text-stone-300 select-none">•</span>
                                                 <span
                                                     className="bg-stone-100 text-stone-700 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider select-none">
-                                                    {person.ageGroup === 'less-8' ? 'Under 8' : 'Age 8+'}
+                                                    {person.ageGroup === 'less-8' ? 'Age less than 8' : 'Age 8 and above'}
                                                 </span>
                                             </div>
                                         </div>
