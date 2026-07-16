@@ -33,7 +33,7 @@ export default function MahatmasForm({people, onChange, errors}: MahatmasFormPro
     }, [people.length]);
 
     const addPerson = () => {
-        onChange([...people, {name: '', mobile: '', ageGroup: 'more-15'}]);
+        onChange([...people, {name: '', mobile: '', ageGroup: 'more-8'}]);
     };
 
     const removePerson = (index: number) => {
@@ -56,7 +56,7 @@ export default function MahatmasForm({people, onChange, errors}: MahatmasFormPro
                     return {...person, name: cleanValue} as Mahatma;
                 }
                 if (field === 'ageGroup') {
-                    return {...person, ageGroup: value as 'less-7' | '7-15' | 'more-15'} as Mahatma;
+                    return {...person, ageGroup: value as 'less-8' | 'more-8'} as Mahatma;
                 }
                 return {...person, [field]: value} as Mahatma;
             }
@@ -138,7 +138,7 @@ export default function MahatmasForm({people, onChange, errors}: MahatmasFormPro
                                             value={person.name}
                                             onChange={(e) => handleFieldChange(index, 'name', e.target.value)}
                                             onBlur={(e) => handleNameBlur(index, e.target.value)}
-                                            placeholder="e.g. Ramesh Patel"
+                                            placeholder="e.g. Chandulal Patel"
                                             className={`w-full pl-10 pr-10 py-2.5 rounded-lg border bg-white text-stone-900 placeholder-stone-500 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all ${
                                                 rowError.name ? 'border-red-400 focus:border-red-500 focus:ring-red-500/20' : 'border-stone-300'
                                             }`}
@@ -212,54 +212,38 @@ export default function MahatmasForm({people, onChange, errors}: MahatmasFormPro
                                     <div
                                         role="radiogroup"
                                         aria-labelledby={`age-group-label-${index}`}
-                                        className="grid grid-cols-1 sm:grid-cols-3 gap-3"
+                                        className="grid grid-cols-1 sm:grid-cols-2 gap-3"
                                     >
-                                        {/* Option 1: Less than 7 */}
+                                        {/* Option 1: Less than 8 */}
                                         <button
                                             type="button"
                                             role="radio"
-                                            aria-checked={person.ageGroup === 'less-7'}
-                                            onClick={() => handleFieldChange(index, 'ageGroup', 'less-7')}
+                                            aria-checked={person.ageGroup === 'less-8'}
+                                            onClick={() => handleFieldChange(index, 'ageGroup', 'less-8')}
                                             className={`flex flex-col items-center justify-center p-3 rounded-xl border text-center transition-all duration-150 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 ${
-                                                person.ageGroup === 'less-7'
+                                                person.ageGroup === 'less-8'
                                                     ? 'bg-primary-light border-primary text-primary shadow-sm ring-1 ring-primary/30 font-bold'
                                                     : 'bg-white border-stone-200 text-stone-600 hover:bg-stone-50/50 hover:border-stone-300'
                                             }`}
                                         >
-                                            <span className="text-sm block">Less than 7</span>
-                                            <span className="text-[10px] opacity-90 mt-0.5 font-semibold">Free</span>
-                                        </button>
-
-                                        {/* Option 2: 7 to 15 */}
-                                        <button
-                                            type="button"
-                                            role="radio"
-                                            aria-checked={person.ageGroup === '7-15'}
-                                            onClick={() => handleFieldChange(index, 'ageGroup', '7-15')}
-                                            className={`flex flex-col items-center justify-center p-3 rounded-xl border text-center transition-all duration-150 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 ${
-                                                person.ageGroup === '7-15'
-                                                    ? 'bg-primary-light border-primary text-primary shadow-sm ring-1 ring-primary/30 font-bold'
-                                                    : 'bg-white border-stone-200 text-stone-600 hover:bg-stone-50/50 hover:border-stone-300'
-                                            }`}
-                                        >
-                                            <span className="text-sm block">7 to 15</span>
+                                            <span className="text-sm block">Less than 8</span>
                                             <span
                                                 className="text-[10px] opacity-90 mt-0.5 font-semibold">Half Price (₹{Math.round(publicConfig.picnicFare / 2)})</span>
                                         </button>
 
-                                        {/* Option 3: More than 15 */}
+                                        {/* Option 2: 8 and above */}
                                         <button
                                             type="button"
                                             role="radio"
-                                            aria-checked={person.ageGroup === 'more-15'}
-                                            onClick={() => handleFieldChange(index, 'ageGroup', 'more-15')}
+                                            aria-checked={person.ageGroup === 'more-8'}
+                                            onClick={() => handleFieldChange(index, 'ageGroup', 'more-8')}
                                             className={`flex flex-col items-center justify-center p-3 rounded-xl border text-center transition-all duration-150 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 ${
-                                                person.ageGroup === 'more-15' || !person.ageGroup
+                                                person.ageGroup === 'more-8' || !person.ageGroup
                                                     ? 'bg-primary-light border-primary text-primary shadow-sm ring-1 ring-primary/30 font-bold'
                                                     : 'bg-white border-stone-200 text-stone-600 hover:bg-stone-50/50 hover:border-stone-300'
                                             }`}
                                         >
-                                            <span className="text-sm block">More than 15</span>
+                                            <span className="text-sm block">8 and above</span>
                                             <span
                                                 className="text-[10px] opacity-90 mt-0.5 font-semibold">Full Price (₹{publicConfig.picnicFare})</span>
                                         </button>

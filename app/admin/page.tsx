@@ -24,7 +24,7 @@ import ScreenshotModal from './components/ScreenshotModal';
 interface Mahatma {
     name: string;
     mobile: string;
-    ageGroup?: 'less-7' | '7-15' | 'more-15';
+    ageGroup?: 'less-8' | 'more-8';
 }
 
 interface Submission {
@@ -225,11 +225,9 @@ export default function AdminDashboardPage() {
             });
 
             sub.people.forEach(person => {
-                const ageGroupText = person.ageGroup === 'less-7'
-                    ? 'Less than 7'
-                    : person.ageGroup === '7-15'
-                        ? '7 to 15'
-                        : 'More than 15';
+                const ageGroupText = person.ageGroup === 'less-8'
+                    ? 'Less than 8'
+                    : '8 and above';
 
                 rows.push([
                     counter.toString(),

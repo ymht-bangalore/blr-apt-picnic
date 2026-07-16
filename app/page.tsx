@@ -15,15 +15,14 @@ import Stepper from './components/Stepper';
 
 export default function RegistrationPage() {
     // Form States
-    const [people, setPeople] = useState<Mahatma[]>([{name: '', mobile: '', ageGroup: 'more-15'}]);
+    const [people, setPeople] = useState<Mahatma[]>([{name: '', mobile: '', ageGroup: 'more-8'}]);
     const [screenshot, setScreenshot] = useState<File | null>(null);
     const [step, setStep] = useState<1 | 2>(1);
     const [isReviewing, setIsReviewing] = useState<boolean>(false);
 
     const calculateTotalAmount = (peopleList: Mahatma[]) => {
         return peopleList.reduce((acc, person) => {
-            if (person.ageGroup === 'less-7') return acc + 0;
-            if (person.ageGroup === '7-15') return acc + Math.round(publicConfig.picnicFare / 2);
+            if (person.ageGroup === 'less-8') return acc + Math.round(publicConfig.picnicFare / 2);
             return acc + publicConfig.picnicFare;
         }, 0);
     };
@@ -124,7 +123,12 @@ export default function RegistrationPage() {
     const handleNextStep = () => {
         if (validateAttendees()) {
             setIsReviewing(true);
-            window.scrollTo({top: 0, behavior: 'smooth'});
+            setTimeout(() => {
+                const element = document.getElementById('registration-form');
+                if (element) {
+                    element.scrollIntoView({behavior: 'smooth', block: 'start'});
+                }
+            }, 100);
         } else {
             // Scroll to first error field
             setTimeout(() => {
@@ -145,10 +149,16 @@ export default function RegistrationPage() {
                 if (!isReviewing) {
                     setIsReviewing(true);
                     setStep(1);
+                    setTimeout(() => {
+                        const element = document.getElementById('registration-form');
+                        if (element) {
+                            element.scrollIntoView({behavior: 'smooth', block: 'start'});
+                        }
+                    }, 100);
                 } else {
                     setStep(2);
+                    window.scrollTo({top: 0, behavior: 'smooth'});
                 }
-                window.scrollTo({top: 0, behavior: 'smooth'});
             } else {
                 // Scroll to first error field
                 setTimeout(() => {
@@ -217,7 +227,7 @@ export default function RegistrationPage() {
     };
 
     const handleReset = () => {
-        setPeople([{name: '', mobile: '', ageGroup: 'more-15'}]);
+        setPeople([{name: '', mobile: '', ageGroup: 'more-8'}]);
         setScreenshot(null);
         setErrors([]);
         setScreenshotError('');
@@ -250,11 +260,11 @@ export default function RegistrationPage() {
                 {/* Stepper Progress Indicator */}
                 <Stepper currentStep={step} onStepClick={handleStepClick}/>
 
-                <form onSubmit={handleSubmit} className="space-y-6">
+                <form id="registration-form" onSubmit={handleSubmit} className="space-y-6 scroll-mt-6">
                     {step === 1 ? (
                         isReviewing ? (
                             <>
-                                {/* Review/Confirm Attendee Details View */}
+                            {/* Review/Confirm Attendee Details View */}
                                 <div
                                     className="bg-white rounded-2xl shadow-sm border border-stone-150 p-6 sm:p-8 mb-6 animate-scale-up">
                                     <div className="border-b border-stone-100 pb-4 mb-6">
@@ -267,16 +277,12 @@ export default function RegistrationPage() {
                                     {/* Attendees List cards */}
                                     <div className="space-y-3">
                                         {people.map((person, index) => {
-                                            const ageLabel = person.ageGroup === 'less-7'
-                                                ? 'Under 7 (Free)'
-                                                : person.ageGroup === '7-15'
-                                                    ? '7 to 15 (Half Price)'
-                                                    : '15+ (Full Price)';
-                                            const personFare = person.ageGroup === 'less-7'
-                                                ? 0
-                                                : person.ageGroup === '7-15'
-                                                    ? Math.round(publicConfig.picnicFare / 2)
-                                                    : publicConfig.picnicFare;
+                                            const ageLabel = person.ageGroup === 'less-8'
+                                                ? 'Under 8 (Half Price)'
+                                                : '8 and above (Full Price)';
+                                            const personFare = person.ageGroup === 'less-8'
+                                                ? Math.round(publicConfig.picnicFare / 2)
+                                                : publicConfig.picnicFare;
 
                                             return (
                                                 <div

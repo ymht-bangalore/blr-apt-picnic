@@ -18,7 +18,7 @@ import {publicConfig} from '@/lib/publicConfig';
 interface Mahatma {
     name: string;
     mobile: string;
-    ageGroup?: 'less-7' | '7-15' | 'more-15';
+    ageGroup?: 'less-8' | 'more-8';
 }
 
 interface Submission {
@@ -219,7 +219,7 @@ export default function SubmissionDetailsModal({
                                                 <span className="text-stone-300 select-none">•</span>
                                                 <span
                                                     className="bg-stone-100 text-stone-700 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider select-none">
-                                                    {person.ageGroup === 'less-7' ? 'Under 7' : person.ageGroup === '7-15' ? 'Age 7-15' : 'Age 15+'}
+                                                    {person.ageGroup === 'less-8' ? 'Under 8' : 'Age 8+'}
                                                 </span>
                                             </div>
                                         </div>

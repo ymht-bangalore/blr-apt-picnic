@@ -123,8 +123,6 @@ export default function RegistrationHeader() {
             <div className="px-6 py-4 bg-stone-50 border-t border-stone-200 text-center">
                 <p className="text-sm text-stone-700 leading-relaxed max-w-2xl mx-auto">
                     Please register all family members attending the picnic to help us plan transportation and food.
-                    Registration is <strong className="text-secondary font-bold">₹{publicConfig.picnicFare} per
-                    person</strong>.
                 </p>
             </div>
         </div>
