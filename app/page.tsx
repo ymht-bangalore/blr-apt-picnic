@@ -18,6 +18,7 @@ export default function RegistrationPage() {
     const [people, setPeople] = useState<Mahatma[]>([{name: '', mobile: '', ageGroup: 'more-15'}]);
     const [screenshot, setScreenshot] = useState<File | null>(null);
     const [step, setStep] = useState<1 | 2>(1);
+    const [isReviewing, setIsReviewing] = useState<boolean>(false);
 
     const calculateTotalAmount = (peopleList: Mahatma[]) => {
         return peopleList.reduce((acc, person) => {
@@ -122,7 +123,8 @@ export default function RegistrationPage() {
     };
     const handleNextStep = () => {
         if (validateAttendees()) {
-            setStep(2);
+            setIsReviewing(true);
+            window.scrollTo({top: 0, behavior: 'smooth'});
         } else {
             // Scroll to first error field
             setTimeout(() => {
@@ -140,7 +142,13 @@ export default function RegistrationPage() {
             window.scrollTo({top: 0, behavior: 'smooth'});
         } else if (targetStep === 2) {
             if (validateAttendees()) {
-                setStep(2);
+                if (!isReviewing) {
+                    setIsReviewing(true);
+                    setStep(1);
+                } else {
+                    setStep(2);
+                }
+                window.scrollTo({top: 0, behavior: 'smooth'});
             } else {
                 // Scroll to first error field
                 setTimeout(() => {
@@ -216,6 +224,7 @@ export default function RegistrationPage() {
         setGeneralError('');
         setSubmissionResult(null);
         setStep(1);
+        setIsReviewing(false);
     };
 
     // Success view display
@@ -243,67 +252,127 @@ export default function RegistrationPage() {
 
                 <form onSubmit={handleSubmit} className="space-y-6">
                     {step === 1 ? (
-                        <>
-                            {/* Step 1: Attendee Details */}
-                            <MahatmasForm
-                                people={people}
-                                onChange={handlePeopleChange}
-                                errors={errors}
-                            />
+                        isReviewing ? (
+                            <>
+                                {/* Review/Confirm Attendee Details View */}
+                                <div
+                                    className="bg-white rounded-2xl shadow-sm border border-stone-150 p-6 sm:p-8 mb-6 animate-scale-up">
+                                    <div className="border-b border-stone-100 pb-4 mb-6">
+                                        <h2 className="text-xl font-bold text-stone-900">Confirm Registration
+                                            Details</h2>
+                                        <p className="text-sm text-stone-600 mt-1">Please review the attendee details
+                                            below before proceeding to payment.</p>
+                                    </div>
 
-                            {/* Proceed Button */}
-                            <div className="pt-2">
-                                <button
-                                    type="button"
-                                    onClick={handleNextStep}
-                                    className="w-full flex items-center justify-center gap-2 py-4 px-6 rounded-2xl text-white font-bold text-base shadow-md transition-all bg-primary hover:bg-primary-hover hover:shadow-lg focus:ring-4 focus:ring-primary/20 active:scale-[0.98] cursor-pointer"
-                                >
-                                    Proceed to Payment
-                                    <ArrowRight20Filled className="shrink-0"/>
-                                </button>
-                            </div>
-                        </>
-                    ) : (
-                        <>
-                            {/* Attendee Summary Card */}
-                            <div className="bg-accent-light border border-accent/25 rounded-2xl p-5 mb-6">
-                                <div className="flex items-center justify-between border-b border-accent/20 pb-3 mb-3">
-                                    <h3 className="text-xs font-bold text-stone-700 uppercase tracking-wider">
-                                        Attendee Summary ({people.length} {people.length === 1 ? 'person' : 'people'})
-                                    </h3>
+                                    {/* Attendees List cards */}
+                                    <div className="space-y-3">
+                                        {people.map((person, index) => {
+                                            const ageLabel = person.ageGroup === 'less-7'
+                                                ? 'Under 7 (Free)'
+                                                : person.ageGroup === '7-15'
+                                                    ? '7 to 15 (Half Price)'
+                                                    : '15+ (Full Price)';
+                                            const personFare = person.ageGroup === 'less-7'
+                                                ? 0
+                                                : person.ageGroup === '7-15'
+                                                    ? Math.round(publicConfig.picnicFare / 2)
+                                                    : publicConfig.picnicFare;
+
+                                            return (
+                                                <div
+                                                    key={index}
+                                                    className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border border-stone-200 rounded-xl bg-stone-50/50 hover:bg-stone-50 transition-all gap-3"
+                                                >
+                                                    <div className="flex items-center gap-3">
+                                                        <div
+                                                            className="w-8 h-8 rounded-xl bg-primary-light text-primary font-bold text-sm flex items-center justify-center shrink-0">
+                                                            {index + 1}
+                                                        </div>
+                                                        <div>
+                                                            <p className="text-sm font-bold text-stone-900">
+                                                                {person.name} {index === 0 && <span
+                                                                className="text-xs text-primary font-bold">(You)</span>}
+                                                            </p>
+                                                            <p className="text-xs text-stone-500 font-mono mt-0.5">{person.mobile || '—'}</p>
+                                                        </div>
+                                                    </div>
+                                                    <div
+                                                        className="flex items-center justify-between sm:justify-end gap-4 border-t sm:border-t-0 border-stone-200 pt-2 sm:pt-0">
+                                                        <span
+                                                            className="text-xs font-semibold bg-stone-200/60 text-stone-750 px-2 py-0.5 rounded-md">
+                                                            {ageLabel}
+                                                        </span>
+                                                        <span
+                                                            className="text-sm font-extrabold text-stone-900 font-mono">
+                                                            ₹{personFare}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+
+                                    {/* Total Fare calculation summary */}
+                                    <div
+                                        className="mt-6 pt-5 border-t border-dashed border-stone-200 flex justify-between items-center">
+                                        <div>
+                                            <span className="text-stone-600 font-bold text-xs uppercase block">Total Amount</span>
+                                            <span className="text-xs text-stone-500">
+                                                Based on age group pricing ({people.length} {people.length === 1 ? 'person' : 'people'})
+                                            </span>
+                                        </div>
+                                        <span className="text-2xl font-black text-stone-950 font-mono">
+                                            ₹{totalAmount}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                {/* Actions */}
+                                <div className="flex flex-col sm:flex-row gap-3 pt-2">
                                     <button
                                         type="button"
-                                        onClick={() => setStep(1)}
-                                        className="text-xs font-bold text-primary hover:text-primary-hover hover:underline cursor-pointer"
+                                        onClick={() => setIsReviewing(false)}
+                                        className="flex-1 py-3.5 px-6 rounded-2xl bg-white hover:bg-stone-50 text-stone-750 font-bold text-sm border border-stone-200 shadow-sm transition-all active:scale-[0.98] cursor-pointer"
                                     >
                                         Edit Details
                                     </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setStep(2);
+                                            window.scrollTo({top: 0, behavior: 'smooth'});
+                                        }}
+                                        className="flex-1 flex items-center justify-center gap-2 py-3.5 px-6 rounded-2xl bg-primary hover:bg-primary-hover text-white font-bold text-sm shadow-md transition-all active:scale-[0.98] cursor-pointer animate-pulse"
+                                    >
+                                        Proceed to Payment
+                                        <ArrowRight20Filled className="shrink-0 w-5 h-5"/>
+                                    </button>
                                 </div>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-stone-900">
-                                    {people.map((person, index) => (
-                                        <div key={index}
-                                             className="flex items-center gap-2.5 bg-white/70 px-3 py-2 rounded-xl border border-stone-200 shadow-sm">
-                                            <span
-                                                className="w-5 h-5 rounded-full bg-primary-light text-primary text-[10px] font-bold flex items-center justify-center shrink-0">
-                                                {index + 1}
-                                            </span>
-                                            <div className="truncate">
-                                                <p className="font-semibold text-stone-900 truncate">
-                                                    {person.name || 'Anonymous'}{index === 0 ? ' (You)' : ''}
-                                                </p>
-                                                <p className="text-[10px] text-stone-500 font-mono flex items-center gap-1.5 mt-0.5">
-                                                    <span>{person.mobile || 'No mobile'}</span>
-                                                    <span>•</span>
-                                                    <span className="text-primary font-bold">
-                                                        {person.ageGroup === 'less-7' ? 'Under 7 (Free)' : person.ageGroup === '7-15' ? '7-15 (Half)' : '15+ (Full)'}
-                                                    </span>
-                                                </p>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
+                            </>
+                        ) : (
+                            <>
+                                {/* Step 1: Attendee Details Form */}
+                                <MahatmasForm
+                                    people={people}
+                                    onChange={handlePeopleChange}
+                                    errors={errors}
+                                />
 
+                                {/* Proceed Button */}
+                                <div className="pt-2">
+                                    <button
+                                        type="button"
+                                        onClick={handleNextStep}
+                                        className="w-full flex items-center justify-center gap-2 py-4 px-6 rounded-2xl text-white font-bold text-base shadow-md transition-all bg-primary hover:bg-primary-hover hover:shadow-lg focus:ring-4 focus:ring-primary/20 active:scale-[0.98] cursor-pointer"
+                                    >
+                                        Proceed to Review
+                                        <ArrowRight20Filled className="shrink-0"/>
+                                    </button>
+                                </div>
+                            </>
+                        )
+                    ) : (
+                        <>
                             {/* Step 2: Payment Details */}
                             <div id="payment-details-section" className="scroll-mt-6">
                                 <PaymentSection
