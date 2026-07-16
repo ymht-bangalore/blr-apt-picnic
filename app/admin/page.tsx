@@ -24,6 +24,7 @@ import ScreenshotModal from './components/ScreenshotModal';
 interface Mahatma {
     name: string;
     mobile: string;
+    ageGroup?: 'less-7' | '7-15' | 'more-15';
 }
 
 interface Submission {
@@ -208,7 +209,7 @@ export default function AdminDashboardPage() {
 
         // 1. Compile CSV rows with all attendees
         const rows: string[][] = [
-            ['S.No', 'Attendee Name', 'Attendee Mobile', 'Primary Contact Name', 'Primary Contact Mobile', 'Fare Paid (₹)', 'Verification Status', 'Submission Date']
+            ['S.No', 'Attendee Name', 'Attendee Age Group', 'Attendee Mobile', 'Primary Contact Name', 'Primary Contact Mobile', 'Fare Paid (₹)', 'Verification Status', 'Submission Date']
         ];
 
         let counter = 1;
@@ -224,9 +225,16 @@ export default function AdminDashboardPage() {
             });
 
             sub.people.forEach(person => {
+                const ageGroupText = person.ageGroup === 'less-7'
+                    ? 'Less than 7'
+                    : person.ageGroup === '7-15'
+                        ? '7 to 15'
+                        : 'More than 15';
+
                 rows.push([
                     counter.toString(),
                     person.name,
+                    ageGroupText,
                     person.mobile || '',
                     primaryContact,
                     primaryMobile,

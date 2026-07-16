@@ -15,9 +15,19 @@ import Stepper from './components/Stepper';
 
 export default function RegistrationPage() {
     // Form States
-    const [people, setPeople] = useState<Mahatma[]>([{name: '', mobile: ''}]);
+    const [people, setPeople] = useState<Mahatma[]>([{name: '', mobile: '', ageGroup: 'more-15'}]);
     const [screenshot, setScreenshot] = useState<File | null>(null);
     const [step, setStep] = useState<1 | 2>(1);
+
+    const calculateTotalAmount = (peopleList: Mahatma[]) => {
+        return peopleList.reduce((acc, person) => {
+            if (person.ageGroup === 'less-7') return acc + 0;
+            if (person.ageGroup === '7-15') return acc + Math.round(publicConfig.picnicFare / 2);
+            return acc + publicConfig.picnicFare;
+        }, 0);
+    };
+
+    const totalAmount = calculateTotalAmount(people);
 
     // Validation States
     const [errors, setErrors] = useState<Array<{ name?: string; mobile?: string }>>([]);
@@ -176,7 +186,7 @@ export default function RegistrationPage() {
         }
 
         setIsSubmitting(true);
-        const amount = people.length * publicConfig.picnicFare;
+        const amount = totalAmount;
 
         try {
             const result = await registerMahatmas(people, amount, screenshot);
@@ -199,7 +209,7 @@ export default function RegistrationPage() {
     };
 
     const handleReset = () => {
-        setPeople([{name: '', mobile: ''}]);
+        setPeople([{name: '', mobile: '', ageGroup: 'more-15'}]);
         setScreenshot(null);
         setErrors([]);
         setScreenshotError('');
@@ -281,7 +291,13 @@ export default function RegistrationPage() {
                                                 <p className="font-semibold text-stone-900 truncate">
                                                     {person.name || 'Anonymous'}{index === 0 ? ' (You)' : ''}
                                                 </p>
-                                                <p className="text-xs text-stone-500 font-mono">{person.mobile || 'No mobile'}</p>
+                                                <p className="text-[10px] text-stone-500 font-mono flex items-center gap-1.5 mt-0.5">
+                                                    <span>{person.mobile || 'No mobile'}</span>
+                                                    <span>•</span>
+                                                    <span className="text-primary font-bold">
+                                                        {person.ageGroup === 'less-7' ? 'Under 7 (Free)' : person.ageGroup === '7-15' ? '7-15 (Half)' : '15+ (Full)'}
+                                                    </span>
+                                                </p>
                                             </div>
                                         </div>
                                     ))}
@@ -291,6 +307,7 @@ export default function RegistrationPage() {
                             {/* Step 2: Payment Details */}
                             <div id="payment-details-section" className="scroll-mt-6">
                                 <PaymentSection
+                                    amount={totalAmount}
                                     peopleCount={people.length}
                                     mainAttendeeName={people[0]?.name || ''}
                                 />

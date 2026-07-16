@@ -10,22 +10,21 @@ import {
     Dismiss20Regular
 } from '@fluentui/react-icons';
 import {QRCodeSVG} from 'qrcode.react';
-import {publicConfig} from '@/lib/publicConfig';
 import {privateConfig} from '@/lib/privateConfig';
 
 interface PaymentSectionProps {
+    amount: number;
     peopleCount: number;
     mainAttendeeName: string;
 }
 
-export default function PaymentSection({peopleCount, mainAttendeeName}: PaymentSectionProps) {
+export default function PaymentSection({amount, peopleCount, mainAttendeeName}: PaymentSectionProps) {
     const [copied, setCopied] = useState(false);
     const [showInstructions, setShowInstructions] = useState(false);
     const [showQRModal, setShowQRModal] = useState(false);
 
     const upiId = privateConfig.upiId;
     const upiName = privateConfig.payeeName;
-    const amount = peopleCount * publicConfig.picnicFare;
 
     // Format standard UPI payment link if configuration is present:
     const upiLink = upiId
@@ -70,7 +69,7 @@ export default function PaymentSection({peopleCount, mainAttendeeName}: PaymentS
                     <div className="flex items-baseline gap-2 mt-1">
                         <span className="text-3xl font-extrabold text-stone-900">₹{amount}</span>
                         <span className="text-sm font-semibold text-stone-600">
-                            (₹{publicConfig.picnicFare} × {peopleCount} {peopleCount === 1 ? 'person' : 'people'})
+                            (for {peopleCount} {peopleCount === 1 ? 'person' : 'people'})
                         </span>
                     </div>
                 </div>

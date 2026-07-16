@@ -3,6 +3,7 @@
 import React, {useRef, useEffect} from 'react';
 import {Add20Regular, Delete20Regular, Person20Regular, Phone20Regular, Dismiss16Regular} from '@fluentui/react-icons';
 import {Mahatma} from '@/lib/db';
+import {publicConfig} from '@/lib/publicConfig';
 
 interface MahatmasFormProps {
     people: Mahatma[];
@@ -32,7 +33,7 @@ export default function MahatmasForm({people, onChange, errors}: MahatmasFormPro
     }, [people.length]);
 
     const addPerson = () => {
-        onChange([...people, {name: '', mobile: ''}]);
+        onChange([...people, {name: '', mobile: '', ageGroup: 'more-15'}]);
     };
 
     const removePerson = (index: number) => {
@@ -47,14 +48,17 @@ export default function MahatmasForm({people, onChange, errors}: MahatmasFormPro
                 if (field === 'mobile') {
                     // Allow only digits and limit to 10 characters
                     const cleanValue = value.replace(/\D/g, '').slice(0, 10);
-                    return {...person, [field]: cleanValue};
+                    return {...person, mobile: cleanValue} as Mahatma;
                 }
                 if (field === 'name') {
                     // Only allow alphabets (a-z, A-Z) and spaces
                     const cleanValue = value.replace(/[^a-zA-Z\s]/g, '');
-                    return {...person, [field]: cleanValue};
+                    return {...person, name: cleanValue} as Mahatma;
                 }
-                return {...person, [field]: value};
+                if (field === 'ageGroup') {
+                    return {...person, ageGroup: value as 'less-7' | '7-15' | 'more-15'} as Mahatma;
+                }
+                return {...person, [field]: value} as Mahatma;
             }
             return person;
         });
@@ -65,7 +69,7 @@ export default function MahatmasForm({people, onChange, errors}: MahatmasFormPro
         const titleCaseValue = toTitleCase(value);
         const updated = people.map((person, idx) => {
             if (idx === index) {
-                return {...person, name: titleCaseValue};
+                return {...person, name: titleCaseValue} as Mahatma;
             }
             return person;
         });
@@ -161,10 +165,10 @@ export default function MahatmasForm({people, onChange, errors}: MahatmasFormPro
                                     <label htmlFor={`mobile-${index}`}
                                            className="block text-sm font-semibold text-stone-800 mb-1.5">
                                         Mobile Number {index === 0 ? (
-                                            <span className="text-red-500 font-bold">*</span>
-                                        ) : (
-                                            <span className="text-stone-500 font-normal text-xs">(Optional)</span>
-                                        )}
+                                        <span className="text-red-500 font-bold">*</span>
+                                    ) : (
+                                        <span className="text-stone-500 font-normal text-xs">(Optional)</span>
+                                    )}
                                     </label>
                                     <div className="relative">
                                         <div
@@ -197,6 +201,69 @@ export default function MahatmasForm({people, onChange, errors}: MahatmasFormPro
                                     {rowError.mobile && (
                                         <p className="mt-1 text-xs font-semibold text-red-650">{rowError.mobile}</p>
                                     )}
+                                </div>
+
+                                {/* Age Group Selection */}
+                                <div className="sm:col-span-2 mt-2 space-y-2">
+                                    <span id={`age-group-label-${index}`}
+                                          className="block text-sm font-semibold text-stone-850">
+                                        Age Group <span className="text-red-500 font-bold">*</span>
+                                    </span>
+                                    <div
+                                        role="radiogroup"
+                                        aria-labelledby={`age-group-label-${index}`}
+                                        className="grid grid-cols-1 sm:grid-cols-3 gap-3"
+                                    >
+                                        {/* Option 1: Less than 7 */}
+                                        <button
+                                            type="button"
+                                            role="radio"
+                                            aria-checked={person.ageGroup === 'less-7'}
+                                            onClick={() => handleFieldChange(index, 'ageGroup', 'less-7')}
+                                            className={`flex flex-col items-center justify-center p-3 rounded-xl border text-center transition-all duration-150 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 ${
+                                                person.ageGroup === 'less-7'
+                                                    ? 'bg-primary-light border-primary text-primary shadow-sm ring-1 ring-primary/30 font-bold'
+                                                    : 'bg-white border-stone-200 text-stone-600 hover:bg-stone-50/50 hover:border-stone-300'
+                                            }`}
+                                        >
+                                            <span className="text-sm block">Less than 7</span>
+                                            <span className="text-[10px] opacity-90 mt-0.5 font-semibold">Free</span>
+                                        </button>
+
+                                        {/* Option 2: 7 to 15 */}
+                                        <button
+                                            type="button"
+                                            role="radio"
+                                            aria-checked={person.ageGroup === '7-15'}
+                                            onClick={() => handleFieldChange(index, 'ageGroup', '7-15')}
+                                            className={`flex flex-col items-center justify-center p-3 rounded-xl border text-center transition-all duration-150 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 ${
+                                                person.ageGroup === '7-15'
+                                                    ? 'bg-primary-light border-primary text-primary shadow-sm ring-1 ring-primary/30 font-bold'
+                                                    : 'bg-white border-stone-200 text-stone-600 hover:bg-stone-50/50 hover:border-stone-300'
+                                            }`}
+                                        >
+                                            <span className="text-sm block">7 to 15</span>
+                                            <span
+                                                className="text-[10px] opacity-90 mt-0.5 font-semibold">Half Price (₹{Math.round(publicConfig.picnicFare / 2)})</span>
+                                        </button>
+
+                                        {/* Option 3: More than 15 */}
+                                        <button
+                                            type="button"
+                                            role="radio"
+                                            aria-checked={person.ageGroup === 'more-15'}
+                                            onClick={() => handleFieldChange(index, 'ageGroup', 'more-15')}
+                                            className={`flex flex-col items-center justify-center p-3 rounded-xl border text-center transition-all duration-150 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 ${
+                                                person.ageGroup === 'more-15' || !person.ageGroup
+                                                    ? 'bg-primary-light border-primary text-primary shadow-sm ring-1 ring-primary/30 font-bold'
+                                                    : 'bg-white border-stone-200 text-stone-600 hover:bg-stone-50/50 hover:border-stone-300'
+                                            }`}
+                                        >
+                                            <span className="text-sm block">More than 15</span>
+                                            <span
+                                                className="text-[10px] opacity-90 mt-0.5 font-semibold">Full Price (₹{publicConfig.picnicFare})</span>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>

@@ -108,15 +108,37 @@ export default function SuccessView({
                         Registered Attendees ({people.length})
                     </h3>
                     <div className="border border-stone-200 rounded-xl divide-y divide-stone-200 overflow-hidden">
-                        {people.map((person, index) => (
-                            <div key={index}
-                                 className="flex justify-between items-center px-4 py-3 bg-white hover:bg-stone-50/30 text-sm">
-                                <span className="font-bold text-stone-900">
-                                    {person.name}{index === 0 ? ' (You)' : ''}
-                                </span>
-                                <span className="font-mono font-semibold text-stone-700">{person.mobile || '—'}</span>
-                            </div>
-                        ))}
+                        {people.map((person, index) => {
+                            const ageGroupLabel = person.ageGroup === 'less-7'
+                                ? 'Under 7 (Free)'
+                                : person.ageGroup === '7-15'
+                                    ? '7 to 15 (Half Price)'
+                                    : '15+ (Full Price)';
+                            const attendeePrice = person.ageGroup === 'less-7'
+                                ? 0
+                                : person.ageGroup === '7-15'
+                                    ? Math.round(publicConfig.picnicFare / 2)
+                                    : publicConfig.picnicFare;
+
+                            return (
+                                <div key={index}
+                                     className="flex justify-between items-center px-4 py-3 bg-white hover:bg-stone-50/30 text-sm">
+                                    <div>
+                                        <span className="font-bold text-stone-900 block">
+                                            {person.name}{index === 0 ? ' (You)' : ''}
+                                        </span>
+                                        <span className="text-xs text-stone-500">
+                                            Age: {ageGroupLabel}
+                                        </span>
+                                    </div>
+                                    <div className="text-right">
+                                        <span
+                                            className="font-mono font-semibold text-stone-750 block">{person.mobile || '—'}</span>
+                                        <span className="text-xs font-semibold text-stone-650">₹{attendeePrice}</span>
+                                    </div>
+                                </div>
+                            );
+                        })}
                     </div>
                 </div>
 
