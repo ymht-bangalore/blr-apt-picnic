@@ -252,7 +252,8 @@ export default function SubmissionDetailsModal({
                             <Money20Regular className="w-5 h-5 text-stone-400"/>
                             <div>
                                 <span className="text-xs text-stone-500 font-semibold block">Total Amount Paid</span>
-                                <span className="text-xl font-black text-stone-900">₹{submission.amount}</span>
+                                <span
+                                    className="text-xl font-black text-stone-900 font-mono">₹{submission.amount.toLocaleString('en-IN')}</span>
                             </div>
                         </div>
 

@@ -264,7 +264,7 @@ export default function RegistrationPage() {
                     {step === 1 ? (
                         isReviewing ? (
                             <>
-                            {/* Review/Confirm Attendee Details View */}
+                                {/* Review/Confirm Attendee Details View */}
                                 <div
                                     className="bg-white rounded-2xl shadow-sm border border-stone-150 p-6 sm:p-8 mb-6 animate-scale-up">
                                     <div className="border-b border-stone-100 pb-4 mb-6">
@@ -328,7 +328,7 @@ export default function RegistrationPage() {
                                             </span>
                                         </div>
                                         <span className="text-2xl font-black text-stone-950 font-mono">
-                                            ₹{totalAmount}
+                                            ₹{totalAmount.toLocaleString('en-IN')}
                                         </span>
                                     </div>
                                 </div>

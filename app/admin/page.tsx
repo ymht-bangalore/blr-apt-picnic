@@ -512,8 +512,8 @@ export default function AdminDashboardPage() {
                             {numPersons}
                           </span>
                                             </td>
-                                            <td className="py-4 px-6 font-extrabold text-stone-900">
-                                                ₹{sub.amount}
+                                            <td className="py-4 px-6 font-extrabold text-stone-900 font-mono">
+                                                ₹{sub.amount.toLocaleString('en-IN')}
                                             </td>
                                             <td className="py-4 px-6" onClick={(e) => e.stopPropagation()}>
                                                 <button

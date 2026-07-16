@@ -63,9 +63,18 @@ export default function SuccessView({
                 {isDemo && (
                     <span
                         className="inline-block mt-3 bg-[#FDF7F0] border border-accent/20 text-secondary text-xs font-semibold px-3 py-1 rounded-full print:hidden">
-            Demo Registration (Saved in LocalStorage)
-          </span>
+                        Demo Registration (Saved in LocalStorage)
+                    </span>
                 )}
+
+                <button
+                    type="button"
+                    onClick={handlePrint}
+                    className="mt-4 flex items-center justify-center gap-1.5 py-2 px-4 rounded-xl border border-emerald-200 text-emerald-850 font-bold text-xs bg-white hover:bg-emerald-100/50 shadow-sm hover:shadow transition-all duration-150 cursor-pointer active:scale-[0.98] print:hidden"
+                >
+                    <Print20Regular className="shrink-0 w-4 h-4"/>
+                    Print Receipt
+                </button>
             </div>
 
             <div className="p-6 sm:p-8 space-y-6">
@@ -130,7 +139,8 @@ export default function SuccessView({
                                     <div className="text-right">
                                         <span
                                             className="font-mono font-semibold text-stone-750 block">{person.mobile || '—'}</span>
-                                        <span className="text-xs font-semibold text-stone-650">₹{attendeePrice}</span>
+                                        <span
+                                            className="text-xs font-semibold text-stone-650 font-mono">₹{attendeePrice.toLocaleString('en-IN')}</span>
                                     </div>
                                 </div>
                             );
@@ -144,7 +154,8 @@ export default function SuccessView({
                         Summary</h3>
                     <div className="flex justify-between items-center text-sm py-1.5">
                         <span className="text-stone-700 font-semibold">Total Amount Paid</span>
-                        <span className="text-lg font-black text-stone-950">₹{amount}</span>
+                        <span
+                            className="text-lg font-black text-stone-950 font-mono">₹{amount.toLocaleString('en-IN')}</span>
                     </div>
                 </div>
 
@@ -162,20 +173,11 @@ export default function SuccessView({
                 </div>
 
                 {/* Buttons (Hidden when printing) */}
-                <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-stone-100 print:hidden">
-                    <button
-                        type="button"
-                        onClick={handlePrint}
-                        className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl border border-stone-200 text-stone-700 font-semibold bg-white hover:bg-stone-50 hover:text-stone-900 shadow-sm transition-all focus:ring-2 focus:ring-stone-200 cursor-pointer"
-                    >
-                        <Print20Regular className="shrink-0"/>
-                        Print Receipt
-                    </button>
-
+                <div className="pt-4 border-t border-stone-100 print:hidden">
                     <button
                         type="button"
                         onClick={onReset}
-                        className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-primary text-white font-semibold hover:bg-primary-hover shadow-sm hover:shadow transition-all focus:ring-2 focus:ring-primary/20 cursor-pointer"
+                        className="w-full flex items-center justify-center gap-2 py-3.5 px-4 rounded-xl bg-primary text-white font-semibold hover:bg-primary-hover shadow-sm hover:shadow transition-all focus:ring-2 focus:ring-primary/20 cursor-pointer"
                     >
                         <ArrowCounterclockwise20Regular className="shrink-0"/>
                         Register More People

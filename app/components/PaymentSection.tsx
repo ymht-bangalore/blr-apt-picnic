@@ -67,7 +67,8 @@ export default function PaymentSection({amount, peopleCount, mainAttendeeName}: 
                     <span
                         className="text-xs font-bold text-stone-600 uppercase tracking-wider block">Calculated Total</span>
                     <div className="flex items-baseline gap-2 mt-1">
-                        <span className="text-3xl font-extrabold text-stone-900">₹{amount}</span>
+                        <span
+                            className="text-3xl font-extrabold text-stone-900">₹{amount.toLocaleString('en-IN')}</span>
                         <span className="text-sm font-semibold text-stone-600">
                             (for {peopleCount} {peopleCount === 1 ? 'person' : 'people'})
                         </span>
@@ -274,7 +275,7 @@ export default function PaymentSection({amount, peopleCount, mainAttendeeName}: 
                                 />
                             </div>
                             <div className="text-center mt-4">
-                                <p className="text-lg font-black text-stone-950 font-mono">₹{amount}</p>
+                                <p className="text-lg font-black text-stone-950 font-mono">₹{amount.toLocaleString('en-IN')}</p>
                                 <p className="text-xs text-stone-500 mt-1 leading-relaxed max-w-64">
                                     Scan with GPay, PhonePe, Paytm, BHIM, or any banking app
                                 </p>
