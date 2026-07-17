@@ -11,12 +11,12 @@ interface PickupPointSelectorProps {
 
 export default function PickupPointSelector({value, onChange, error}: PickupPointSelectorProps) {
     const options = [
-        {id: 'ms-palya', name: 'MS Palya'},
-        {id: 'mysore-bank', name: 'Mysore Bank (Majestic)'},
         {id: 'akshay-nagar', name: 'Akshay Nagar (NRI Layout)'},
         {id: 'hedge-nagar', name: 'Hedge Nagar'},
-        {id: 'whitefield', name: 'Whitefield'},
         {id: 'iskcon', name: 'Iskcon Rajaji Nagar'},
+        {id: 'ms-palya', name: 'MS Palya'},
+        {id: 'mysore-bank', name: 'Mysore Bank (Majestic)'},
+        {id: 'whitefield', name: 'Whitefield'},
         {id: 'self', name: 'Self'},
     ];
 
