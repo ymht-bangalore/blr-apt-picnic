@@ -270,14 +270,22 @@ export default function SubmissionDetailsModal({
                             </div>
                         </div>
 
-                        <button
-                            type="button"
-                            onClick={() => onViewScreenshot(submission.screenshot_url, submission.people[0]?.name || 'Mahatma')}
-                            className="flex items-center gap-1.5 py-2.5 px-4 bg-primary hover:bg-primary-hover text-white text-xs font-bold rounded-xl shadow-sm transition-all cursor-pointer active:scale-95"
-                        >
-                            <Image20Regular className="w-4 h-4 shrink-0"/>
-                            View Screenshot
-                        </button>
+                        {submission.screenshot_url ? (
+                            <button
+                                type="button"
+                                onClick={() => onViewScreenshot(submission.screenshot_url, submission.people[0]?.name || 'Mahatma')}
+                                className="flex items-center gap-1.5 py-2.5 px-4 bg-primary hover:bg-primary-hover text-white text-xs font-bold rounded-xl shadow-sm transition-all cursor-pointer active:scale-95"
+                            >
+                                <Image20Regular className="w-4 h-4 shrink-0"/>
+                                View Screenshot
+                            </button>
+                        ) : (
+                            <span
+                                className="flex items-center gap-1.5 py-2 px-3 bg-amber-50 border border-amber-200/40 text-amber-700 text-xs font-bold rounded-xl select-none">
+                                <Warning24Filled className="w-4 h-4 shrink-0 text-amber-500"/>
+                                Pending Upload
+                            </span>
+                        )}
                     </div>
                 </div>
             </div>

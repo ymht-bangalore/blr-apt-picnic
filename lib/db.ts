@@ -9,7 +9,6 @@ export interface Mahatma {
 export interface RegistrationResult {
     success: boolean;
     registrationId?: string;
-    isDemo: boolean;
     error?: string;
     people?: Mahatma[];
 }
@@ -26,22 +25,20 @@ const toTitleCase = (str: string): string => {
 };
 
 /**
- * Registers a list of Mahatmas for the picnic, uploads the payment screenshot,
- * and inserts the registration record into Supabase.
- * Falls back to LocalStorage if Supabase is not configured.
+ * Creates an initial pending registration record in Supabase (or LocalStorage).
+ * This is called on load of the payment section to reserve the registration.
  */
-export async function registerMahatmas(
+export async function createPendingRegistration(
     people: Mahatma[],
     amount: number,
-    pickupPoint: string,
-    screenshotFile: File | null
+    pickupPoint: string
 ): Promise<RegistrationResult> {
     // Validate input parameters
     if (people.length === 0) {
-        return {success: false, isDemo: !isSupabaseConfigured, error: 'Please enter at least one person.'};
+        return {success: false, error: 'Please enter at least one person.'};
     }
     if (!pickupPoint || !pickupPoint.trim()) {
-        return {success: false, isDemo: !isSupabaseConfigured, error: 'Please select a pickup point.'};
+        return {success: false, error: 'Please select a pickup point.'};
     }
 
     const processedPeople: Mahatma[] = [];
@@ -49,12 +46,11 @@ export async function registerMahatmas(
         const person = people[i];
         const cleanName = person.name.trim();
         if (!cleanName) {
-            return {success: false, isDemo: !isSupabaseConfigured, error: 'All names must be filled out.'};
+            return {success: false, error: 'All names must be filled out.'};
         }
         if (!/^[a-zA-Z\s]+$/.test(cleanName)) {
             return {
                 success: false,
-                isDemo: !isSupabaseConfigured,
                 error: `Invalid name "${person.name}". Names must only contain alphabets and spaces.`
             };
         }
@@ -63,7 +59,6 @@ export async function registerMahatmas(
             if (!/^\d{10}$/.test(cleanMobile)) {
                 return {
                     success: false,
-                    isDemo: !isSupabaseConfigured,
                     error: `Invalid mobile number for primary attendee ${person.name}. Must be exactly 10 digits.`
                 };
             }
@@ -71,7 +66,6 @@ export async function registerMahatmas(
             if (cleanMobile && !/^\d{10}$/.test(cleanMobile)) {
                 return {
                     success: false,
-                    isDemo: !isSupabaseConfigured,
                     error: `Invalid mobile number for attendee ${person.name}. Must be exactly 10 digits if provided.`
                 };
             }
@@ -84,124 +78,132 @@ export async function registerMahatmas(
         });
     }
 
-    if (!screenshotFile) {
-        return {success: false, isDemo: !isSupabaseConfigured, error: 'Please upload a payment screenshot.'};
-    }
-
     // --- Real Supabase Submission ---
-    if (isSupabaseConfigured && supabase) {
-        try {
-            // 1. Upload screenshot file to Supabase storage
-            const fileExt = screenshotFile.name.split('.').pop() || 'png';
-            const cleanFileName = screenshotFile.name
-                .substring(0, screenshotFile.name.lastIndexOf('.'))
-                .replace(/[^a-zA-Z0-9]/g, '_');
-
-            const filePath = `${Date.now()}_${Math.random().toString(36).substring(2, 11)}_${cleanFileName}.${fileExt}`;
-
-            const {error: uploadError} = await supabase.storage
-                .from('screenshots')
-                .upload(filePath, screenshotFile, {
-                    cacheControl: '3600',
-                    upsert: false
-                });
-
-            if (uploadError) {
-                console.error('Storage Upload Error:', uploadError);
-                return {
-                    success: false,
-                    isDemo: false,
-                    error: `Screenshot upload failed: ${uploadError.message}. Make sure the 'screenshots' bucket exists in Supabase Storage.`
-                };
-            }
-
-            // 2. Get Public URL of the uploaded screenshot
-            const {data: {publicUrl}} = supabase.storage
-                .from('screenshots')
-                .getPublicUrl(filePath);
-
-            // Generate registration ID client-side to avoid calling .select('id'),
-            // which requires SELECT permission under Row-Level Security (RLS) policies.
-            const registrationId = typeof crypto !== 'undefined' && crypto.randomUUID
-                ? crypto.randomUUID()
-                : `${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
-
-            // 3. Insert into registrations table
-            const {error: insertError} = await supabase
-                .from('registrations')
-                .insert([
-                    {
-                        id: registrationId,
-                        people: processedPeople,
-                        amount,
-                        pickup_point: pickupPoint,
-                        screenshot_url: publicUrl,
-                        status: 'pending'
-                    }
-                ]);
-
-            if (insertError) {
-                console.error('Database Insert Error:', insertError);
-                return {
-                    success: false,
-                    isDemo: false,
-                    error: `Registration failed: ${insertError.message}`
-                };
-            }
-
-            return {
-                success: true,
-                isDemo: false,
-                registrationId,
-                people: processedPeople
-            };
-
-        } catch (e: any) {
-            console.error('Unexpected error in registration:', e);
-            return {
-                success: false,
-                isDemo: false,
-                error: e.message || 'An unexpected error occurred during registration.'
-            };
-        }
+    if (!isSupabaseConfigured || !supabase) {
+        return {
+            success: false,
+            error: 'Supabase database is not configured. Please check environment variables.'
+        };
     }
-
-    // --- Mock Mode Fallback ---
-    // Wait 1.5 seconds to simulate network latency
-    await new Promise((resolve) => setTimeout(resolve, 1500));
 
     try {
-        const mockId = `demo-reg-${Math.random().toString(36).substring(2, 10).toUpperCase()}`;
-        const mockScreenshotUrl = URL.createObjectURL(screenshotFile);
+        // Generate registration ID client-side
+        const registrationId = typeof crypto !== 'undefined' && crypto.randomUUID
+            ? crypto.randomUUID()
+            : `${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
 
-        // Save to LocalStorage for debugging
-        const existing = localStorage.getItem('mock_registrations');
-        const list = existing ? JSON.parse(existing) : [];
+        // Insert into registrations table with placeholder for screenshot
+        const {error: insertError} = await supabase
+            .from('registrations')
+            .insert([
+                {
+                    id: registrationId,
+                    people: processedPeople,
+                    amount,
+                    pickup_point: pickupPoint,
+                    screenshot_url: '', // Empty placeholder as per schema requirement
+                    status: 'pending'
+                }
+            ]);
 
-        const newRecord = {
-            id: mockId,
-            created_at: new Date().toISOString(),
-            people: processedPeople,
-            amount,
-            pickup_point: pickupPoint,
-            screenshot_url: mockScreenshotUrl,
-            status: 'pending'
-        };
-
-        list.push(newRecord);
-        localStorage.setItem('mock_registrations', JSON.stringify(list));
+        if (insertError) {
+            console.error('Database Insert Error:', insertError);
+            return {
+                success: false,
+                error: `Registration initialization failed: ${insertError.message}`
+            };
+        }
 
         return {
             success: true,
-            isDemo: true,
-            registrationId: mockId,
+            registrationId,
             people: processedPeople
         };
+
     } catch (e: any) {
+        console.error('Unexpected error in registration init:', e);
         return {
             success: false,
-            isDemo: true,
-            error: `Demo Registration Error: ${e.message}`
+            error: e.message || 'An unexpected error occurred during registration initialization.'
+        };
+    }
+}
+
+/**
+ * Uploads a payment screenshot to Supabase
+ * and links it to the existing registration record by ID.
+ */
+export async function uploadPaymentScreenshot(
+    registrationId: string,
+    screenshotFile: File
+): Promise<{ success: boolean; error?: string; screenshotUrl?: string }> {
+    if (!screenshotFile) {
+        return {success: false, error: 'Please upload a payment screenshot.'};
+    }
+
+    // --- Real Supabase Submission ---
+    if (!isSupabaseConfigured || !supabase) {
+        return {
+            success: false,
+            error: 'Supabase database is not configured. Please check environment variables.'
+        };
+    }
+
+    try {
+        // 1. Upload screenshot file to Supabase storage
+        const fileExt = screenshotFile.name.split('.').pop() || 'png';
+        const cleanFileName = screenshotFile.name
+            .substring(0, screenshotFile.name.lastIndexOf('.'))
+            .replace(/[^a-zA-Z0-9]/g, '_');
+
+        const filePath = `${Date.now()}_${Math.random().toString(36).substring(2, 11)}_${cleanFileName}.${fileExt}`;
+
+        const {error: uploadError} = await supabase.storage
+            .from('screenshots')
+            .upload(filePath, screenshotFile, {
+                cacheControl: '3600',
+                upsert: false
+            });
+
+        if (uploadError) {
+            console.error('Storage Upload Error:', uploadError);
+            return {
+                success: false,
+                error: `Screenshot upload failed: ${uploadError.message}. Make sure the 'screenshots' bucket exists in Supabase Storage.`
+            };
+        }
+
+        // 2. Get Public URL of the uploaded screenshot
+        const {data: {publicUrl}} = supabase.storage
+            .from('screenshots')
+            .getPublicUrl(filePath);
+
+        // 3. Update registrations table with publicUrl
+        const {error: updateError} = await supabase
+            .from('registrations')
+            .update({
+                screenshot_url: publicUrl
+            })
+            .eq('id', registrationId);
+
+        if (updateError) {
+            console.error('Database Update Error:', updateError);
+            return {
+                success: false,
+                error: `Registration update failed: ${updateError.message}`
+            };
+        }
+
+        return {
+            success: true,
+            screenshotUrl: publicUrl
+        };
+
+    } catch (e: any) {
+        console.error('Unexpected error in screenshot upload:', e);
+        return {
+            success: false,
+            error: e.message || 'An unexpected error occurred during screenshot upload.'
         };
     }
 }

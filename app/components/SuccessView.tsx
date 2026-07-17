@@ -18,7 +18,6 @@ interface SuccessViewProps {
     people: Mahatma[];
     amount: number;
     pickupPoint: string;
-    isDemo: boolean;
     onReset: () => void;
 }
 
@@ -27,7 +26,6 @@ export default function SuccessView({
                                         people,
                                         amount,
                                         pickupPoint,
-                                        isDemo,
                                         onReset
                                     }: SuccessViewProps) {
     useEffect(() => {
@@ -63,12 +61,6 @@ export default function SuccessView({
                     WhatsApp group soon.
                 </p>
 
-                {isDemo && (
-                    <span
-                        className="inline-block mt-3 bg-[#FDF7F0] border border-accent/20 text-secondary text-xs font-semibold px-3 py-1 rounded-full print:hidden">
-                        Demo Registration (Saved in LocalStorage)
-                    </span>
-                )}
 
                 <button
                     type="button"

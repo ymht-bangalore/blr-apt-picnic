@@ -64,7 +64,6 @@ ON public.registrations
 FOR INSERT 
 WITH CHECK (true);
 
--- Restrict read/write to authenticated admins only (protect Mahatma privacy)
 CREATE
 POLICY "Allow admin read access"
 ON public.registrations 
@@ -73,6 +72,15 @@ SELECT
     TO authenticated
     USING (true);
 
+-- Allow public to select registrations (required for UPDATE filters to locate the row)
+CREATE
+POLICY "Allow public select of pending registrations"
+ON public.registrations
+FOR
+SELECT
+    TO anon, authenticated
+    USING (status = 'pending');
+
 CREATE
 POLICY "Allow admin update access"
 ON public.registrations 
@@ -80,6 +88,15 @@ FOR
 UPDATE
     TO authenticated
     USING (true);
+
+-- Allow public to update pending registrations (e.g. to attach screenshots)
+CREATE
+POLICY "Allow public update of pending registrations"
+ON public.registrations
+FOR
+UPDATE
+    USING (status = 'pending')
+WITH CHECK (status = 'pending');
 
 
 -- 3. Storage Setup for Payment Screenshots

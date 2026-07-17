@@ -41,7 +41,6 @@ export default function AdminDashboardPage() {
     const [password, setPassword] = useState<string | null>(null);
     const [isCheckingSession, setIsCheckingSession] = useState(true);
     const [submissions, setSubmissions] = useState<Submission[]>([]);
-    const [isDemoMode, setIsDemoMode] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
@@ -82,20 +81,7 @@ export default function AdminDashboardPage() {
                 setError('Session expired. Please log in again.');
             } else if (response.ok) {
                 const data = await response.json();
-                if (data.isDemo) {
-                    setIsDemoMode(true);
-                    // Load mock data from LocalStorage
-                    const localData = localStorage.getItem('mock_registrations');
-                    const parsed = localData ? JSON.parse(localData) : [];
-                    // Sort descending by created_at
-                    parsed.sort((a: Submission, b: Submission) =>
-                        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-                    );
-                    setSubmissions(parsed);
-                } else {
-                    setIsDemoMode(false);
-                    setSubmissions(data.submissions || []);
-                }
+                setSubmissions(data.submissions || []);
             } else {
                 const data = await response.json();
                 setError(data.error || 'Failed to fetch submissions.');
@@ -118,68 +104,43 @@ export default function AdminDashboardPage() {
         sessionStorage.removeItem('admin_password');
         setPassword(null);
         setSubmissions([]);
-        setIsDemoMode(false);
     };
 
-    // Status updates (supports both remote DB and LocalStorage demo mode)
+    // Status updates
     const handleUpdateStatus = async (id: string, newStatus: string) => {
         if (!password) return;
 
         try {
-            if (isDemoMode) {
-                // Update LocalStorage
-                const localData = localStorage.getItem('mock_registrations');
-                const parsed: Submission[] = localData ? JSON.parse(localData) : [];
-                const updated = parsed.map(item => {
+            // Update database via API
+            const response = await fetch('/api/admin/submissions', {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-admin-password': password,
+                },
+                body: JSON.stringify({id, status: newStatus}),
+            });
+
+            if (response.ok) {
+                // Success, update local state
+                const updatedSubmissions = submissions.map(item => {
                     if (item.id === id) {
                         return {...item, status: newStatus};
                     }
                     return item;
                 });
-                localStorage.setItem('mock_registrations', JSON.stringify(updated));
-
-                // Update state
-                setSubmissions(
-                    updated.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-                );
+                setSubmissions(updatedSubmissions);
 
                 // Update selected modal submission if open
                 if (selectedSubmission && selectedSubmission.id === id) {
                     setSelectedSubmission(prev => prev ? {...prev, status: newStatus} : null);
                 }
             } else {
-                // Update database via API
-                const response = await fetch('/api/admin/submissions', {
-                    method: 'PATCH',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'x-admin-password': password,
-                    },
-                    body: JSON.stringify({id, status: newStatus}),
-                });
-
-                if (response.ok) {
-                    // Success, update local state
-                    const updatedSubmissions = submissions.map(item => {
-                        if (item.id === id) {
-                            return {...item, status: newStatus};
-                        }
-                        return item;
-                    });
-                    setSubmissions(updatedSubmissions);
-
-                    // Update selected modal submission if open
-                    if (selectedSubmission && selectedSubmission.id === id) {
-                        setSelectedSubmission(prev => prev ? {...prev, status: newStatus} : null);
-                    }
-                } else {
-                    const data = await response.json();
-                    throw new Error(data.error || 'Failed to update status on server');
-                }
+                const data = await response.json();
+                throw new Error(data.error || 'Failed to update status on server');
             }
         } catch (err: any) {
-            console.error(err);
-            throw new Error(err.message || 'Verification update failed.');
+            setError(err.message || 'Failed to update status. Please try again.');
         }
     };
 
@@ -307,29 +268,6 @@ export default function AdminDashboardPage() {
     return (
         <div className="flex-1 w-full flex flex-col min-h-screen">
             <main className="flex-1 max-w-7xl w-full mx-auto py-8 px-4 sm:px-6 lg:px-8 space-y-8">
-
-                {/* Banner Alert for Demo Mode */}
-                {isDemoMode && (
-                    <div
-                        className="bg-accent-light border border-accent/20 rounded-3xl p-5 text-sm text-accent-hover flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-sm">
-                        <div className="flex items-start gap-3">
-                            <span className="text-2xl mt-0.5 shrink-0">💡</span>
-                            <div>
-                                <h4 className="font-extrabold text-stone-900 leading-tight">Database Demo Mode
-                                    Active</h4>
-                                <p className="text-stone-600 mt-1 text-xs sm:text-sm leading-relaxed">
-                                    Supabase API keys are not fully configured in your environment variables.
-                                    Showing mock registrations saved in local storage. To use real Supabase database,
-                                    set
-                                    <code
-                                        className="bg-stone-100 text-primary font-mono px-1.5 py-0.5 rounded border border-stone-200 mx-1 text-xs font-semibold">SUPABASE_SECRET_KEY</code>
-                                    in your <code
-                                    className="bg-stone-100 font-mono px-1 rounded text-xs border border-stone-200">.env.local</code> file.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                )}
 
                 {/* Header */}
                 <div
@@ -525,16 +463,25 @@ export default function AdminDashboardPage() {
                                                 ₹{sub.amount.toLocaleString('en-IN')}
                                             </td>
                                             <td className="py-4 px-6" onClick={(e) => e.stopPropagation()}>
-                                                <button
-                                                    onClick={() => setScreenshotPreview({
-                                                        url: sub.screenshot_url,
-                                                        name: person1.name
-                                                    })}
-                                                    className="inline-flex items-center gap-1 px-3 py-1.5 bg-stone-50 hover:bg-stone-100 border border-stone-200 rounded-xl text-xs font-bold text-stone-600 transition-all cursor-pointer"
-                                                >
-                                                    <Eye24Regular className="w-4 h-4 shrink-0 text-stone-500"/>
-                                                    View Screenshot
-                                                </button>
+                                                {sub.screenshot_url ? (
+                                                    <button
+                                                        onClick={() => setScreenshotPreview({
+                                                            url: sub.screenshot_url,
+                                                            name: person1.name
+                                                        })}
+                                                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-stone-50 hover:bg-stone-100 border border-stone-200 rounded-xl text-xs font-bold text-stone-600 transition-all cursor-pointer"
+                                                    >
+                                                        <Eye24Regular className="w-4 h-4 shrink-0 text-stone-500"/>
+                                                        View Screenshot
+                                                    </button>
+                                                ) : (
+                                                    <span
+                                                        className="inline-flex items-center gap-1 px-2.5 py-1 bg-amber-50 border border-amber-200/40 rounded-lg text-[10px] font-bold text-amber-700 select-none">
+                                                        <Warning24Filled
+                                                            className="w-3.5 h-3.5 shrink-0 text-amber-500"/>
+                                                        Pending Upload
+                                                    </span>
+                                                )}
                                             </td>
                                             <td className="py-4 px-6">
                                                 <div className="flex items-center gap-1.5">

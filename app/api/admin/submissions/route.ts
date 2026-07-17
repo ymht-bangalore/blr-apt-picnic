@@ -25,11 +25,10 @@ export async function GET(request: Request) {
                 return NextResponse.json({error: `Database error: ${error.message}`}, {status: 500});
             }
 
-            return NextResponse.json({submissions: data || [], isDemo: false});
+            return NextResponse.json({submissions: data || []});
         }
 
-        // Fallback: indicate that database is not configured, and dashboard should run in mock mode using LocalStorage
-        return NextResponse.json({submissions: [], isDemo: true});
+        return NextResponse.json({error: 'Supabase database is not configured.'}, {status: 500});
     } catch (e: any) {
         return NextResponse.json(
             {error: e.message || 'An unexpected error occurred on the server.'},
@@ -65,8 +64,7 @@ export async function PATCH(request: Request) {
             return NextResponse.json({success: true, data});
         }
 
-        // In demo mode, the client is responsible for updating its local storage.
-        return NextResponse.json({success: true, isDemo: true});
+        return NextResponse.json({error: 'Supabase database is not configured.'}, {status: 500});
     } catch (e: any) {
         return NextResponse.json(
             {error: e.message || 'An unexpected error occurred on the server.'},

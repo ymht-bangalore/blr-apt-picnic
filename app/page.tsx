@@ -1,8 +1,9 @@
 'use client';
 
 import React, {useState, useEffect} from 'react';
-import {registerMahatmas, Mahatma} from '@/lib/db';
+import {createPendingRegistration, uploadPaymentScreenshot, Mahatma} from '@/lib/db';
 import {publicConfig} from '@/lib/publicConfig';
+import Alert from './components/Alert';
 import {ArrowRight20Filled, Location20Filled} from '@fluentui/react-icons';
 
 // Import Components
@@ -130,11 +131,46 @@ export default function RegistrationPage() {
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
     const [submissionResult, setSubmissionResult] = useState<{
         registrationId: string;
-        isDemo: boolean;
         people: Mahatma[];
         amount: number;
         pickupPoint: string;
     } | null>(null);
+
+    // Two-step registration states
+    const [registrationId, setRegistrationId] = useState<string | null>(null);
+    const [isInitializingRegistration, setIsInitializingRegistration] = useState<boolean>(false);
+    const [initError, setInitError] = useState<string>('');
+
+    // Initialize pending registration in the database when the payment step is loaded
+    useEffect(() => {
+        if (step === 2 && !registrationId && !isInitializingRegistration) {
+            const initRegistration = async () => {
+                setIsInitializingRegistration(true);
+                setInitError('');
+                try {
+                    const result = await createPendingRegistration(people, totalAmount, pickupPoint);
+                    if (result.success && result.registrationId) {
+                        setRegistrationId(result.registrationId);
+                    } else {
+                        setInitError(result.error || 'Failed to initialize registration.');
+                    }
+                } catch (err: any) {
+                    setInitError(err.message || 'An unexpected error occurred during initialization.');
+                } finally {
+                    setIsInitializingRegistration(false);
+                }
+            };
+            initRegistration();
+        }
+    }, [step, registrationId, people, totalAmount, pickupPoint, isInitializingRegistration]);
+
+    // Reset registration ID when returning to step 1 (editing details)
+    useEffect(() => {
+        if (step === 1) {
+            setRegistrationId(null);
+            setInitError('');
+        }
+    }, [step]);
 
     // Scroll to payment details on step 2 transition
     useEffect(() => {
@@ -316,17 +352,27 @@ export default function RegistrationPage() {
             return;
         }
 
+        if (!registrationId) {
+            if (isInitializingRegistration) {
+                setGeneralError('Registration is still initializing. Please wait a moment and try again.');
+            } else if (initError) {
+                setGeneralError(`Cannot submit: ${initError}. Please go back to step 1, verify details, and try again.`);
+            } else {
+                setGeneralError('Registration not initialized. Please try again.');
+            }
+            return;
+        }
+
         setIsSubmitting(true);
         const amount = totalAmount;
 
         try {
-            const result = await registerMahatmas(people, amount, pickupPoint, screenshot);
+            const result = await uploadPaymentScreenshot(registrationId, screenshot!);
 
-            if (result.success && result.registrationId) {
+            if (result.success) {
                 setSubmissionResult({
-                    registrationId: result.registrationId,
-                    isDemo: result.isDemo,
-                    people: result.people || [...people],
+                    registrationId: registrationId,
+                    people: [...people],
                     amount,
                     pickupPoint: pickupPoint
                 });
@@ -344,8 +390,9 @@ export default function RegistrationPage() {
                 setErrors([]);
                 setPickupPointError('');
                 setScreenshotError('');
+                setRegistrationId(null);
             } else {
-                setGeneralError(result.error || 'Registration failed. Please try again.');
+                setGeneralError(result.error || 'Registration update failed. Please try again.');
             }
         } catch (err: any) {
             setGeneralError(err.message || 'An unexpected error occurred. Please try again.');
@@ -363,6 +410,7 @@ export default function RegistrationPage() {
         setScreenshotError('');
         setGeneralError('');
         setSubmissionResult(null);
+        setRegistrationId(null);
         if (typeof window !== 'undefined') {
             sessionStorage.removeItem('blr_picnic_registration_form');
             sessionStorage.removeItem('blr_picnic_pickup_point');
@@ -379,7 +427,6 @@ export default function RegistrationPage() {
                     people={submissionResult.people}
                     amount={submissionResult.amount}
                     pickupPoint={submissionResult.pickupPoint}
-                    isDemo={submissionResult.isDemo}
                     onReset={handleReset}
                 />
             </div>
@@ -394,7 +441,8 @@ export default function RegistrationPage() {
                 {/* Stepper Progress Indicator */}
                 <Stepper currentStep={step} onStepClick={handleStepClick}/>
 
-                <form id="registration-form" onSubmit={handleSubmit} className="space-y-6 scroll-mt-6">
+                <form id="registration-form" onSubmit={handleSubmit}
+                      className="space-y-6 scroll-mt-6">
                     {step === 1 ? (
                         isReviewing ? (
                             <>
@@ -566,20 +614,42 @@ export default function RegistrationPage() {
                                 </div>
                             )}
 
+                            {initError && (
+                                <div className="mb-4 animate-scale-up">
+                                    <Alert
+                                        type="error"
+                                        message={`Registration initialization failed: ${initError}. Please go back to step 1, verify details, and try again.`}
+                                    />
+                                </div>
+                            )}
+
                             {/* Sticky Bottom Actions Bar */}
                             <div
                                 className="sticky bottom-0 left-0 right-0 z-30 bg-white/85 backdrop-blur-md rounded-t-2xl border-t border-stone-150 py-4 px-4 sm:px-6 lg:px-8 -mx-4 sm:-mx-6 lg:-mx-8 shadow-[0_-4px_16px_rgba(45,36,29,0.05)] transition-all">
                                 <div className="max-w-4xl mx-auto flex items-center justify-end">
                                     <button
                                         type="submit"
-                                        disabled={isSubmitting}
+                                        disabled={isSubmitting || isInitializingRegistration || !!initError}
                                         className={`w-full sm:w-auto min-w-50 flex items-center justify-center gap-2 py-3.5 px-6 rounded-2xl text-white font-bold text-base shadow-md transition-all ${
-                                            isSubmitting
-                                                ? 'bg-primary/70 cursor-not-allowed'
+                                            isSubmitting || isInitializingRegistration || !!initError
+                                                ? 'bg-stone-300 text-stone-500 cursor-not-allowed shadow-none'
                                                 : 'bg-primary hover:bg-primary-hover hover:shadow-lg focus:ring-4 focus:ring-primary/20 active:scale-[0.98] cursor-pointer'
                                         }`}
                                     >
-                                        {isSubmitting ? (
+                                        {isInitializingRegistration ? (
+                                            <>
+                                                <svg
+                                                    className="animate-spin -ml-1 mr-3 h-5 w-5 text-stone-500 inline-block"
+                                                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                    <circle className="opacity-25" cx="12" cy="12" r="10"
+                                                            stroke="currentColor"
+                                                            strokeWidth="4"></circle>
+                                                    <path className="opacity-75" fill="currentColor"
+                                                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                </svg>
+                                                Initializing Registration...
+                                            </>
+                                        ) : isSubmitting ? (
                                             <>
                                                 <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline-block"
                                                      xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

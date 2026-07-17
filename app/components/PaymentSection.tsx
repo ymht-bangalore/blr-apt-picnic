@@ -302,7 +302,7 @@ export default function PaymentSection({amount, peopleCount, mainAttendeeName}: 
                                 onClick={() => setShowQRModal(false)}
                                 className="w-full py-2 bg-primary text-white text-xs font-bold rounded-xl hover:bg-primary-hover shadow-sm transition-all cursor-pointer active:scale-[0.98]"
                             >
-                                Close
+                                Done
                             </button>
                         </div>
                     </div>
