@@ -65,7 +65,7 @@ export default function UploadSection({
         <div className="bg-white rounded-2xl shadow-sm border border-stone-150 p-6 sm:p-8 mb-6">
             {/* Header */}
             <div className="border-b border-stone-100 pb-4 mb-6">
-                <h2 className="text-xl font-bold text-stone-900">Payment Verification</h2>
+                <h2 className="text-xl font-bold text-stone-900">Upload Payment Screenshot</h2>
                 <p className="text-sm text-stone-655 mt-1">Upload proof of payment to complete registration</p>
             </div>
 

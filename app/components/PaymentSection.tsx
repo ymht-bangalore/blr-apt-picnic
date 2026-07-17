@@ -85,7 +85,7 @@ export default function PaymentSection({amount, peopleCount, mainAttendeeName}: 
 
                 <Alert
                     type="secondary"
-                    message="Please note: The registration amount is non-refundable."
+                    message="Please note: The amount is non-refundable."
                 />
 
                 {/* Option 1: Pay via UPI ID */}
@@ -166,15 +166,15 @@ export default function PaymentSection({amount, peopleCount, mainAttendeeName}: 
                 </div>
 
                 {/* Small Help Tip */}
-                {upiId && (
-                    <div
-                        className="text-xs text-stone-600 bg-stone-50 border border-stone-150 rounded-xl p-3 flex items-start gap-2.5">
-                        <Info20Regular className="text-stone-400 shrink-0 w-4 h-4 mt-0.5"/>
-                        <span>
-                            Make sure to verify the payee name is <strong>{upiName}</strong> and transfer exactly <strong>₹{amount}</strong>.
-                        </span>
-                    </div>
-                )}
+                {/*{upiId && (*/}
+                {/*    <div*/}
+                {/*        className="text-xs text-stone-600 bg-stone-50 border border-stone-150 rounded-xl p-3 flex items-start gap-2.5">*/}
+                {/*        <Info20Regular className="text-stone-400 shrink-0 w-4 h-4 mt-0.5"/>*/}
+                {/*        <span>*/}
+                {/*            Make sure to verify the payee name is <strong>{upiName}</strong> and transfer exactly <strong>₹{amount}</strong>.*/}
+                {/*        </span>*/}
+                {/*    </div>*/}
+                {/*)}*/}
             </div>
 
             {/* Payment Instructions Modal */}
