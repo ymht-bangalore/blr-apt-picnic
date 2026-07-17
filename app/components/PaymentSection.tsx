@@ -11,6 +11,7 @@ import {
 } from '@fluentui/react-icons';
 import {QRCodeSVG} from 'qrcode.react';
 import {privateConfig} from '@/lib/privateConfig';
+import Alert from './Alert';
 
 interface PaymentSectionProps {
     amount: number;
@@ -64,16 +65,28 @@ export default function PaymentSection({amount, peopleCount, mainAttendeeName}: 
             <div className="space-y-5 max-w-lg mx-auto">
                 {/* Price Calculation Badge */}
                 <div className="bg-[#FDF7F0] border border-accent/30 rounded-xl p-4.5">
-                    <span
-                        className="text-xs font-bold text-stone-600 uppercase tracking-wider block">Calculated Total</span>
-                    <div className="flex items-baseline gap-2 mt-1">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                        <div>
+                            <span className="text-xs font-bold text-stone-600 uppercase tracking-wider block">Calculated Total</span>
+                            <div className="flex items-baseline gap-2 mt-1">
+                                <span
+                                    className="text-3xl font-extrabold text-stone-900">₹{amount.toLocaleString('en-IN')}</span>
+                                <span className="text-sm font-semibold text-stone-600">
+                                    (for {peopleCount} {peopleCount === 1 ? 'person' : 'people'})
+                                </span>
+                            </div>
+                        </div>
                         <span
-                            className="text-3xl font-extrabold text-stone-900">₹{amount.toLocaleString('en-IN')}</span>
-                        <span className="text-sm font-semibold text-stone-600">
-                            (for {peopleCount} {peopleCount === 1 ? 'person' : 'people'})
+                            className="text-[10px] font-bold text-accent-hover bg-white border border-accent/25 rounded-lg px-2.5 py-1 w-fit self-start sm:self-center shrink-0 shadow-sm">
+                            Inclusive of transportation & food
                         </span>
                     </div>
                 </div>
+
+                <Alert
+                    type="secondary"
+                    message="Please note: The registration amount is non-refundable."
+                />
 
                 {/* Option 1: Pay via UPI ID */}
                 <div className="space-y-2">
