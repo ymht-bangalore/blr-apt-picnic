@@ -24,6 +24,16 @@ export default function PaymentSection({amount, peopleCount, mainAttendeeName}: 
     const [showInstructions, setShowInstructions] = useState(false);
     const [showQRModal, setShowQRModal] = useState(false);
 
+    const handleCloseQRModal = () => {
+        setShowQRModal(false);
+        setTimeout(() => {
+            window.scrollTo({
+                top: document.documentElement.scrollHeight,
+                behavior: 'smooth'
+            });
+        }, 100);
+    };
+
     const upiId = privateConfig.upiId;
     const upiName = privateConfig.payeeName;
 
@@ -252,7 +262,7 @@ export default function PaymentSection({amount, peopleCount, mainAttendeeName}: 
             {/* QR Code Modal */}
             {showQRModal && upiId && (
                 <div
-                    onClick={() => setShowQRModal(false)}
+                    onClick={handleCloseQRModal}
                     className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/60 backdrop-blur-sm transition-all duration-300"
                 >
                     <div
@@ -268,7 +278,7 @@ export default function PaymentSection({amount, peopleCount, mainAttendeeName}: 
                             </h3>
                             <button
                                 type="button"
-                                onClick={() => setShowQRModal(false)}
+                                onClick={handleCloseQRModal}
                                 className="p-1 rounded-lg text-stone-500 hover:text-stone-700 hover:bg-stone-100 focus:outline-none transition-colors duration-150 cursor-pointer"
                                 title="Close"
                             >
@@ -293,13 +303,26 @@ export default function PaymentSection({amount, peopleCount, mainAttendeeName}: 
                                     Scan with GPay, PhonePe, Paytm, BHIM, or any banking app
                                 </p>
                             </div>
+
+                            {/* Screenshot Submission Notice */}
+                            <div
+                                className="w-full mt-4 bg-amber-50 border border-amber-200/50 rounded-xl p-3 flex items-start gap-2.5 text-left animate-pulse-subtle">
+                                <span className="text-lg leading-none shrink-0 select-none">📸</span>
+                                <div>
+                                    <h5 className="font-bold text-amber-900 text-xs">Screenshot Required!</h5>
+                                    <p className="text-[11px] text-amber-800 mt-0.5 leading-relaxed font-medium">
+                                        Please take a screenshot of the successful payment page and upload it in the
+                                        next section to complete your registration.
+                                    </p>
+                                </div>
+                            </div>
                         </div>
 
                         {/* Modal Footer */}
                         <div className="px-5 py-3.5 bg-stone-50/50 border-t border-stone-100 flex justify-center">
                             <button
                                 type="button"
-                                onClick={() => setShowQRModal(false)}
+                                onClick={handleCloseQRModal}
                                 className="w-full py-2 bg-primary text-white text-xs font-bold rounded-xl hover:bg-primary-hover shadow-sm transition-all cursor-pointer active:scale-[0.98]"
                             >
                                 Done
