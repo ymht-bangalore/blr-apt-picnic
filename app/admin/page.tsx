@@ -13,7 +13,10 @@ import {
     Warning24Filled,
     ArrowDownload24Regular,
     Dismiss20Regular,
-    Print24Regular
+    Print24Regular,
+    ArrowSort20Regular,
+    ArrowSortUp20Regular,
+    ArrowSortDown20Regular
 } from '@fluentui/react-icons';
 
 // Import subcomponents
@@ -49,6 +52,19 @@ export default function AdminDashboardPage() {
     // Search and Filter state
     const [searchQuery, setSearchQuery] = useState('');
     const [statusFilter, setStatusFilter] = useState('all');
+
+    // Sorting state
+    const [sortField, setSortField] = useState<'date' | 'name'>('date');
+    const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+
+    const handleSort = (field: 'date' | 'name') => {
+        if (sortField === field) {
+            setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc');
+        } else {
+            setSortField(field);
+            setSortOrder(field === 'date' ? 'desc' : 'asc');
+        }
+    };
 
     // Modal states
     const [selectedSubmission, setSelectedSubmission] = useState<Submission | null>(null);
@@ -230,20 +246,32 @@ export default function AdminDashboardPage() {
         document.body.removeChild(link);
     };
 
-    // Filter & Search submissions
-    const filteredSubmissions = submissions.filter((sub) => {
-        const person1 = sub.people?.[0];
-        const nameMatch = person1?.name?.toLowerCase().includes(searchQuery.toLowerCase());
-        const phoneMatch = (person1?.mobile || '').includes(searchQuery) || false;
-        const anyAttendeeMatch = sub.people?.some(p =>
-            p.name.toLowerCase().includes(searchQuery.toLowerCase()) || (p.mobile || '').includes(searchQuery)
-        ) || false;
+    // Filter & Search & Sort submissions
+    const filteredSubmissions = submissions
+        .filter((sub) => {
+            const person1 = sub.people?.[0];
+            const nameMatch = person1?.name?.toLowerCase().includes(searchQuery.toLowerCase());
+            const phoneMatch = (person1?.mobile || '').includes(searchQuery) || false;
+            const anyAttendeeMatch = sub.people?.some(p =>
+                p.name.toLowerCase().includes(searchQuery.toLowerCase()) || (p.mobile || '').includes(searchQuery)
+            ) || false;
 
-        const matchesSearch = nameMatch || phoneMatch || anyAttendeeMatch;
-        const matchesStatus = statusFilter === 'all' || sub.status === statusFilter;
+            const matchesSearch = nameMatch || phoneMatch || anyAttendeeMatch;
+            const matchesStatus = statusFilter === 'all' || sub.status === statusFilter;
 
-        return matchesSearch && matchesStatus;
-    });
+            return matchesSearch && matchesStatus;
+        })
+        .sort((a, b) => {
+            if (sortField === 'date') {
+                const valA = new Date(a.created_at).getTime();
+                const valB = new Date(b.created_at).getTime();
+                return sortOrder === 'asc' ? valA - valB : valB - valA;
+            } else {
+                const valA = (a.people?.[0]?.name || '').trim().toLowerCase();
+                const valB = (b.people?.[0]?.name || '').trim().toLowerCase();
+                return sortOrder === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
+            }
+        });
 
     if (isCheckingSession) {
         return (
@@ -369,6 +397,29 @@ export default function AdminDashboardPage() {
                                 ))}
                             </div>
 
+                            {/* Sort Selector */}
+                            <div className="flex items-center gap-2 shrink-0">
+                                <span
+                                    className="text-xs font-bold text-stone-500 flex items-center gap-1 mr-1 shrink-0">
+                                    <ArrowSort20Regular className="w-4 h-4 text-stone-500"/>
+                                    Sort:
+                                </span>
+                                <select
+                                    value={`${sortField}-${sortOrder}`}
+                                    onChange={(e) => {
+                                        const [field, order] = e.target.value.split('-') as ['date' | 'name', 'asc' | 'desc'];
+                                        setSortField(field);
+                                        setSortOrder(order);
+                                    }}
+                                    className="bg-white border border-stone-200 hover:bg-stone-50 rounded-xl px-3 py-2 text-xs font-bold text-stone-600 transition-all cursor-pointer focus:ring-2 focus:ring-primary/20 outline-none"
+                                >
+                                    <option value="date-desc">Date (Newest First)</option>
+                                    <option value="date-asc">Date (Oldest First)</option>
+                                    <option value="name-asc">Name (A - Z)</option>
+                                    <option value="name-desc">Name (Z - A)</option>
+                                </select>
+                            </div>
+
                             {/* Download CSV button */}
                             <button
                                 type="button"
@@ -416,8 +467,44 @@ export default function AdminDashboardPage() {
                             <table className="w-full text-left border-collapse">
                                 <thead>
                                 <tr className="border-b border-stone-100 text-xs font-bold text-stone-400 uppercase tracking-wider bg-stone-50/50">
-                                    <th className="py-4.5 px-6">Submit Date</th>
-                                    <th className="py-4.5 px-6">Person 1 (Primary)</th>
+                                    <th
+                                        className="py-4.5 px-6 cursor-pointer hover:bg-stone-100/50 transition-colors select-none group"
+                                        onClick={() => handleSort('date')}
+                                        title="Sort by Submit Date"
+                                    >
+                                        <div className="flex items-center gap-1">
+                                            Submit Date
+                                            {sortField === 'date' ? (
+                                                sortOrder === 'asc' ? (
+                                                    <ArrowSortUp20Regular className="w-4 h-4 text-primary shrink-0"/>
+                                                ) : (
+                                                    <ArrowSortDown20Regular className="w-4 h-4 text-primary shrink-0"/>
+                                                )
+                                            ) : (
+                                                <ArrowSort20Regular
+                                                    className="w-4 h-4 text-stone-300 group-hover:text-stone-400 shrink-0 transition-colors"/>
+                                            )}
+                                        </div>
+                                    </th>
+                                    <th
+                                        className="py-4.5 px-6 cursor-pointer hover:bg-stone-100/50 transition-colors select-none group"
+                                        onClick={() => handleSort('name')}
+                                        title="Sort by Person 1 Name"
+                                    >
+                                        <div className="flex items-center gap-1">
+                                            Person 1 (Primary)
+                                            {sortField === 'name' ? (
+                                                sortOrder === 'asc' ? (
+                                                    <ArrowSortUp20Regular className="w-4 h-4 text-primary shrink-0"/>
+                                                ) : (
+                                                    <ArrowSortDown20Regular className="w-4 h-4 text-primary shrink-0"/>
+                                                )
+                                            ) : (
+                                                <ArrowSort20Regular
+                                                    className="w-4 h-4 text-stone-300 group-hover:text-stone-400 shrink-0 transition-colors"/>
+                                            )}
+                                        </div>
+                                    </th>
                                     <th className="py-4.5 px-6 text-center">Attendees</th>
                                     <th className="py-4.5 px-6">Paid Amount</th>
                                     <th className="py-4.5 px-6">Receipt</th>
@@ -439,7 +526,7 @@ export default function AdminDashboardPage() {
                                     return (
                                         <tr
                                             key={sub.id}
-                                            className="hover:bg-stone-50/40 transition-colors group cursor-pointer"
+                                            className="hover:bg-stone-50/40 transition-[background-color] group cursor-pointer"
                                             onClick={() => setSelectedSubmission(sub)}
                                         >
                                             <td className="py-4 px-6 font-medium text-stone-600">
