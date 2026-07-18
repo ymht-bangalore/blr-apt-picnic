@@ -102,7 +102,7 @@ export default function MahatmasForm({people, onChange, errors}: MahatmasFormPro
                             {/* Row Header */}
                             <div className="flex items-center justify-between mb-4">
                                 <span className="text-xs font-bold text-stone-600 uppercase tracking-wider">
-                                  Attendee #{index + 1} {index === 0 && '(You)'}
+                                  Attendee #{index + 1} {index === 0 && '(Primary Contact)'}
                                 </span>
 
                                 {people.length > 1 && (

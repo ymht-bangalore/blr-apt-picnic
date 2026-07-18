@@ -130,7 +130,7 @@ export default function SuccessView({
                                      className="flex justify-between items-center px-4 py-3 bg-white hover:bg-stone-50/30 text-sm">
                                     <div>
                                         <span className="font-bold text-stone-900 block">
-                                            {person.name}{index === 0 ? ' (You)' : ''}
+                                            {person.name}{index === 0 ? ' (Primary Contact)' : ''}
                                         </span>
                                         <span className="text-xs text-stone-500">
                                             Age: {ageGroupLabel}

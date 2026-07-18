@@ -495,7 +495,7 @@ export default function RegistrationPage() {
                                                         <div>
                                                             <p className="text-sm font-bold text-stone-900">
                                                                 {person.name} {index === 0 && <span
-                                                                className="text-xs text-primary font-bold">(You)</span>}
+                                                                className="text-xs text-primary font-bold">(Primary Contact)</span>}
                                                             </p>
                                                             <p className="text-xs text-stone-500 font-mono mt-0.5">{person.mobile || '—'}</p>
                                                         </div>

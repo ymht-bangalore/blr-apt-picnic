@@ -16,7 +16,7 @@ flow, dynamic UPI/QR payment generation, receipt upload, and a robust administra
     * Strict alphabetic validation on names (blocks non-alphabet keys dynamically).
     * Auto-formatting to **Title Case** on field blur.
     * Asterisk markers indicating mandatory fields.
-    * "Primary Contact" (first attendee) is labeled with `(You)` to guide the registrant.
+    * "Primary Contact" (first attendee) is labeled with `(Primary Contact)` to guide the registrant.
     * Subsequent attendees' mobile numbers are **optional**, allowing families to register with a single phone contact.
 * **Navigation validations:** Allows users to jump to the Payment step by clicking the circle stepper nodes, provided
   the input details are valid.
