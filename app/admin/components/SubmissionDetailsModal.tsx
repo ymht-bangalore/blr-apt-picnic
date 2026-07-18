@@ -11,9 +11,11 @@ import {
     CheckmarkCircle24Filled,
     DismissCircle24Filled,
     Warning24Filled,
-    Call20Filled
+    Call20Filled,
+    Print20Regular
 } from '@fluentui/react-icons';
 import {publicConfig} from '@/lib/publicConfig';
+import {printReceipt} from '@/lib/receipt';
 
 interface Mahatma {
     name: string;
@@ -260,7 +262,8 @@ export default function SubmissionDetailsModal({
                     </div>
 
                     {/* Amount and Receipt */}
-                    <div className="pt-2 flex items-center justify-between border-t border-stone-100">
+                    <div
+                        className="pt-4 flex flex-col sm:flex-row sm:items-center justify-between border-t border-stone-100 gap-4">
                         <div className="flex items-center gap-1">
                             <Money20Regular className="w-5 h-5 text-stone-400"/>
                             <div>
@@ -270,22 +273,34 @@ export default function SubmissionDetailsModal({
                             </div>
                         </div>
 
-                        {submission.screenshot_url ? (
+                        <div className="flex items-center gap-2">
                             <button
                                 type="button"
-                                onClick={() => onViewScreenshot(submission.screenshot_url, submission.people[0]?.name || 'Mahatma')}
-                                className="flex items-center gap-1.5 py-2.5 px-4 bg-primary hover:bg-primary-hover text-white text-xs font-bold rounded-xl shadow-sm transition-all cursor-pointer active:scale-95"
+                                onClick={() => printReceipt(submission)}
+                                className="flex items-center gap-1.5 py-2.5 px-4 bg-stone-50 hover:bg-stone-100 border border-stone-200 text-stone-700 text-xs font-bold rounded-xl shadow-sm transition-all cursor-pointer active:scale-95"
+                                title="Print registration receipt or save as PDF"
                             >
-                                <Image20Regular className="w-4 h-4 shrink-0"/>
-                                View Screenshot
+                                <Print20Regular className="w-4.5 h-4.5 shrink-0 text-stone-500"/>
+                                Print Receipt
                             </button>
-                        ) : (
-                            <span
-                                className="flex items-center gap-1.5 py-2 px-3 bg-amber-50 border border-amber-200/40 text-amber-700 text-xs font-bold rounded-xl select-none">
-                                <Warning24Filled className="w-4 h-4 shrink-0 text-amber-500"/>
-                                Pending Upload
-                            </span>
-                        )}
+
+                            {submission.screenshot_url ? (
+                                <button
+                                    type="button"
+                                    onClick={() => onViewScreenshot(submission.screenshot_url, submission.people[0]?.name || 'Mahatma')}
+                                    className="flex items-center gap-1.5 py-2.5 px-4 bg-primary hover:bg-primary-hover text-white text-xs font-bold rounded-xl shadow-sm transition-all cursor-pointer active:scale-95"
+                                >
+                                    <Image20Regular className="w-4 h-4 shrink-0"/>
+                                    View Screenshot
+                                </button>
+                            ) : (
+                                <span
+                                    className="flex items-center gap-1.5 py-2 px-3 bg-amber-50 border border-amber-200/40 text-amber-700 text-xs font-bold rounded-xl select-none">
+                                    <Warning24Filled className="w-4 h-4 shrink-0 text-amber-500"/>
+                                    Pending Upload
+                                </span>
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>

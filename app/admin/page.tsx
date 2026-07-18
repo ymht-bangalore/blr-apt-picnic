@@ -12,7 +12,8 @@ import {
     DismissCircle24Filled,
     Warning24Filled,
     ArrowDownload24Regular,
-    Dismiss20Regular
+    Dismiss20Regular,
+    Print24Regular
 } from '@fluentui/react-icons';
 
 // Import subcomponents
@@ -20,6 +21,7 @@ import AdminLogin from './components/AdminLogin';
 import AdminStats from './components/AdminStats';
 import SubmissionDetailsModal from './components/SubmissionDetailsModal';
 import ScreenshotModal from './components/ScreenshotModal';
+import {printReceipt} from '@/lib/receipt';
 
 interface Mahatma {
     name: string;
@@ -420,7 +422,7 @@ export default function AdminDashboardPage() {
                                     <th className="py-4.5 px-6">Paid Amount</th>
                                     <th className="py-4.5 px-6">Receipt</th>
                                     <th className="py-4.5 px-6">Status</th>
-                                    <th className="py-4.5 px-6 text-right">Actions</th>
+                                    <th className="py-4.5 px-6 text-center">Actions</th>
                                 </tr>
                                 </thead>
                                 <tbody className="divide-y divide-stone-100 text-sm">
@@ -454,10 +456,10 @@ export default function AdminDashboardPage() {
                                                 </div>
                                             </td>
                                             <td className="py-4 px-6 text-center">
-                          <span
-                              className="inline-flex items-center justify-center font-bold px-2.5 py-1 bg-stone-100 border border-stone-200 text-stone-700 text-xs rounded-lg min-w-8">
-                            {numPersons}
-                          </span>
+                                                <span
+                                                    className="inline-flex items-center justify-center font-bold px-2.5 py-1 bg-stone-100 border border-stone-200 text-stone-700 text-xs rounded-lg min-w-8">
+                                                    {numPersons}
+                                                </span>
                                             </td>
                                             <td className="py-4 px-6 font-extrabold text-stone-900 font-mono">
                                                 ₹{sub.amount.toLocaleString('en-IN')}
@@ -488,18 +490,27 @@ export default function AdminDashboardPage() {
                                                     {getStatusIcon(sub.status)}
                                                     <span
                                                         className={`px-2.5 py-0.5 text-xs font-extrabold border rounded-full ${getStatusBadgeClass(sub.status)}`}>
-                              {sub.status}
-                            </span>
+                                                        {sub.status}
+                                                    </span>
                                                 </div>
                                             </td>
                                             <td className="py-4 px-6 text-right" onClick={(e) => e.stopPropagation()}>
-                                                <button
-                                                    onClick={() => setSelectedSubmission(sub)}
-                                                    className="inline-flex items-center justify-center p-2 text-stone-400 group-hover:text-primary hover:bg-stone-100 rounded-xl transition-all cursor-pointer"
-                                                    title="View all details"
-                                                >
-                                                    <ChevronRight24Regular className="w-5 h-5"/>
-                                                </button>
+                                                <div className="flex items-center justify-end gap-1.5">
+                                                    <button
+                                                        onClick={() => printReceipt(sub)}
+                                                        className="inline-flex items-center justify-center p-2 text-stone-400 hover:text-primary hover:bg-stone-100 rounded-xl transition-all cursor-pointer"
+                                                        title="Print booking receipt"
+                                                    >
+                                                        <Print24Regular className="w-5 h-5"/>
+                                                    </button>
+                                                    <button
+                                                        onClick={() => setSelectedSubmission(sub)}
+                                                        className="inline-flex items-center justify-center p-2 text-stone-400 group-hover:text-primary hover:bg-stone-100 rounded-xl transition-all cursor-pointer"
+                                                        title="View all details"
+                                                    >
+                                                        <ChevronRight24Regular className="w-5 h-5"/>
+                                                    </button>
+                                                </div>
                                             </td>
                                         </tr>
                                     );
