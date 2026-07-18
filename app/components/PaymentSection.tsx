@@ -7,7 +7,8 @@ import {
     QrCode24Regular,
     Warning24Filled,
     Info20Regular,
-    Dismiss20Regular
+    Dismiss20Regular,
+    ArrowDownload20Regular
 } from '@fluentui/react-icons';
 import {QRCodeSVG} from 'qrcode.react';
 import {privateConfig} from '@/lib/privateConfig';
@@ -50,6 +51,163 @@ export default function PaymentSection({amount, peopleCount, mainAttendeeName}: 
             setTimeout(() => setCopied(false), 2000);
         } catch (err) {
             console.error('Failed to copy text: ', err);
+        }
+    };
+
+    const handleDownloadQR = () => {
+        const svgElement = document.getElementById('payment-qr-code-svg');
+        if (!svgElement) return;
+
+        try {
+            // 1. Serialize the SVG to string
+            const serializer = new XMLSerializer();
+            const svgString = serializer.serializeToString(svgElement);
+
+            // 2. Create blob URL
+            const svgBlob = new Blob([svgString], {type: 'image/svg+xml;charset=utf-8'});
+            const URL = window.URL || window.webkitURL || window;
+            const blobURL = URL.createObjectURL(svgBlob);
+
+            // 3. Render into canvas for PNG download
+            const image = new Image();
+            image.onload = () => {
+                const canvas = document.createElement('canvas');
+                // High-resolution scaled dimensions for mobile readability (1200 x 1600)
+                canvas.width = 1200;
+                canvas.height = 1600;
+                const context = canvas.getContext('2d');
+                if (context) {
+                    // Helper to draw rounded rectangle
+                    const drawRoundRect = (
+                        ctx: CanvasRenderingContext2D,
+                        x: number,
+                        y: number,
+                        w: number,
+                        h: number,
+                        r: number
+                    ) => {
+                        ctx.beginPath();
+                        ctx.moveTo(x + r, y);
+                        ctx.lineTo(x + w - r, y);
+                        ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+                        ctx.lineTo(x + w, y + h - r);
+                        ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+                        ctx.lineTo(x + r, y + h);
+                        ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+                        ctx.lineTo(x, y + r);
+                        ctx.quadraticCurveTo(x, y, x + r, y);
+                        ctx.closePath();
+                    };
+
+                    // Draw base card background (warm background theme)
+                    context.fillStyle = '#fdfbf7';
+                    context.fillRect(0, 0, canvas.width, canvas.height);
+
+                    // Draw nice inner border frame (removed thick outer border)
+                    context.strokeStyle = 'rgba(203, 75, 31, 0.08)';
+                    context.lineWidth = 4;
+                    context.strokeRect(36, 36, canvas.width - 72, canvas.height - 72);
+
+                    // Centering helper
+                    context.textAlign = 'center';
+
+                    // 1. Jai Satchitanand Badge
+                    context.fillStyle = '#fef2ee';
+                    drawRoundRect(context, canvas.width / 2 - 220, 80, 440, 70, 35);
+                    context.fill();
+                    context.strokeStyle = 'rgba(203, 75, 31, 0.15)';
+                    context.lineWidth = 2;
+                    drawRoundRect(context, canvas.width / 2 - 220, 80, 440, 70, 35);
+                    context.stroke();
+
+                    context.font = 'bold 28px sans-serif';
+                    context.fillStyle = '#CB4B1F';
+                    context.fillText('JAI SATCHITANAND', canvas.width / 2, 125);
+
+                    // 2. Title
+                    context.font = '900 64px sans-serif';
+                    context.fillStyle = '#2d241d';
+                    context.fillText('Picnic Payment QR', canvas.width / 2, 225);
+
+                    // 3. Primary Contact / Payer name
+                    context.font = 'bold 26px sans-serif';
+                    context.fillStyle = '#8c827a';
+                    context.fillText('PRIMARY REGISTRANT', canvas.width / 2, 305);
+
+                    const displayName = mainAttendeeName
+                        ? (mainAttendeeName.length > 26 ? mainAttendeeName.substring(0, 23) + '...' : mainAttendeeName)
+                        : 'Mahatma';
+                    context.font = '800 48px sans-serif';
+                    context.fillStyle = '#2d241d';
+                    context.fillText(displayName, canvas.width / 2, 365);
+
+                    // 4. Amount Box
+                    context.fillStyle = '#fef2ee';
+                    drawRoundRect(context, 80, 420, canvas.width - 160, 160, 36);
+                    context.fill();
+                    context.strokeStyle = 'rgba(203, 75, 31, 0.2)';
+                    context.lineWidth = 3;
+                    drawRoundRect(context, 80, 420, canvas.width - 160, 160, 36);
+                    context.stroke();
+
+                    // Amount label
+                    context.font = 'bold 24px sans-serif';
+                    context.fillStyle = '#CB4B1F';
+                    context.fillText('TOTAL AMOUNT TO TRANSFER', canvas.width / 2, 470);
+
+                    // Amount value
+                    context.font = '900 72px monospace';
+                    context.fillStyle = '#2d241d';
+                    context.fillText(`₹${amount.toLocaleString('en-IN')}`, canvas.width / 2, 545);
+
+                    // 5. QR Code Card Container (Increased Size)
+                    const qrSize = 720; // 360 * 2 (Increased size)
+                    const qrX = (canvas.width - qrSize) / 2;
+                    const qrY = 660;
+
+                    context.fillStyle = '#ffffff';
+                    drawRoundRect(context, qrX - 48, qrY - 48, qrSize + 96, qrSize + 96, 48);
+                    context.fill();
+                    context.strokeStyle = '#f0ebe6';
+                    context.lineWidth = 4;
+                    drawRoundRect(context, qrX - 48, qrY - 48, qrSize + 96, qrSize + 96, 48);
+                    context.stroke();
+
+                    // Draw the QR Code image
+                    context.drawImage(image, qrX, qrY, qrSize, qrSize);
+
+                    // Scan instruction under QR
+                    context.font = 'bold 30px sans-serif';
+                    context.fillStyle = '#8c827a';
+                    context.fillText('SCAN WITH GPay, PHONEPE, PAYTM, OR BHIM', canvas.width / 2, qrY + qrSize + 95);
+
+                    // 6. Footer Divider
+                    context.strokeStyle = '#e5dfd9';
+                    context.lineWidth = 2;
+                    context.beginPath();
+                    context.moveTo(80, 1510);
+                    context.lineTo(canvas.width - 80, 1510);
+                    context.stroke();
+
+                    context.font = 'bold 24px sans-serif';
+                    context.fillStyle = '#8c827a';
+                    context.fillText('Upload transaction screenshot after paying to complete registration.', canvas.width / 2, 1550);
+
+                    // Trigger direct PNG download
+                    const pngUrl = canvas.toDataURL('image/png');
+                    const downloadLink = document.createElement('a');
+                    downloadLink.href = pngUrl;
+                    const cleanName = displayName.replace(/[^\w\s-]/g, '').replace(/\s+/g, '_');
+                    downloadLink.download = `picnic_payment_qr_₹${amount}_${cleanName}.png`;
+                    document.body.appendChild(downloadLink);
+                    downloadLink.click();
+                    document.body.removeChild(downloadLink);
+                }
+                URL.revokeObjectURL(blobURL);
+            };
+            image.src = blobURL;
+        } catch (error) {
+            console.error('Failed to download QR code:', error);
         }
     };
 
@@ -290,6 +448,7 @@ export default function PaymentSection({amount, peopleCount, mainAttendeeName}: 
                         <div className="p-6 flex flex-col items-center justify-center bg-white">
                             <div className="bg-white p-4 rounded-xl shadow-md border border-stone-150">
                                 <QRCodeSVG
+                                    id="payment-qr-code-svg"
                                     value={upiLink}
                                     size={240}
                                     level="H"
@@ -303,6 +462,17 @@ export default function PaymentSection({amount, peopleCount, mainAttendeeName}: 
                                     Scan with GPay, PhonePe, Paytm, BHIM, or any banking app
                                 </p>
                             </div>
+
+                            {amount <= 2000 && (
+                                <button
+                                    type="button"
+                                    onClick={handleDownloadQR}
+                                    className="mt-4 flex items-center justify-center gap-1.5 py-2 px-4 rounded-xl border border-stone-200 text-stone-700 hover:text-stone-955 bg-white hover:bg-stone-50 shadow-sm hover:shadow transition-all duration-150 cursor-pointer text-xs font-bold active:scale-[0.98]"
+                                >
+                                    <ArrowDownload20Regular className="shrink-0 w-4 h-4 text-emerald-600"/>
+                                    Download QR Code
+                                </button>
+                            )}
 
                             {/* Screenshot Submission Notice */}
                             <div
