@@ -1,7 +1,7 @@
 'use client';
 
 import React, {useState, useEffect} from 'react';
-import {createPendingRegistration, uploadPaymentScreenshot, Mahatma} from '@/lib/db';
+import {createPendingRegistration, uploadPaymentScreenshot, deletePendingRegistration, Mahatma} from '@/lib/db';
 import {publicConfig} from '@/lib/publicConfig';
 import Alert from './components/Alert';
 import {ArrowRight20Filled, Location20Filled} from '@fluentui/react-icons';
@@ -140,19 +140,58 @@ export default function RegistrationPage() {
     const [registrationId, setRegistrationId] = useState<string | null>(null);
     const [isInitializingRegistration, setIsInitializingRegistration] = useState<boolean>(false);
     const [initError, setInitError] = useState<string>('');
+    const [lastSubmittedData, setLastSubmittedData] = useState<{
+        people: Mahatma[];
+        pickupPoint: string;
+    } | null>(null);
 
     // Initialize pending registration in the database when the payment step is loaded
     useEffect(() => {
-        if (step === 2 && !registrationId && !isInitializingRegistration) {
+        if (step === 2 && !isInitializingRegistration) {
+            const hasChanged = () => {
+                if (!lastSubmittedData) return false;
+                if (pickupPoint !== lastSubmittedData.pickupPoint) return true;
+                if (people.length !== lastSubmittedData.people.length) return true;
+                for (let i = 0; i < people.length; i++) {
+                    const current = people[i];
+                    const last = lastSubmittedData.people[i];
+                    if (
+                        current.name !== last.name ||
+                        current.mobile !== last.mobile ||
+                        current.ageGroup !== last.ageGroup
+                    ) {
+                        return true;
+                    }
+                }
+                return false;
+            };
+
             const initRegistration = async () => {
                 setIsInitializingRegistration(true);
                 setInitError('');
                 try {
-                    const result = await createPendingRegistration(people, totalAmount, pickupPoint);
-                    if (result.success && result.registrationId) {
-                        setRegistrationId(result.registrationId);
-                    } else {
-                        setInitError(result.error || 'Failed to initialize registration.');
+                    let currentRegId = registrationId;
+
+                    // If details have changed and we have a previous registration, delete it first
+                    if (currentRegId && hasChanged()) {
+                        await deletePendingRegistration(currentRegId);
+                        setRegistrationId(null);
+                        currentRegId = null;
+                        setLastSubmittedData(null);
+                    }
+
+                    // If we don't have a registrationId (first time or after delete), create one
+                    if (!currentRegId) {
+                        const result = await createPendingRegistration(people, totalAmount, pickupPoint);
+                        if (result.success && result.registrationId) {
+                            setRegistrationId(result.registrationId);
+                            setLastSubmittedData({
+                                people: JSON.parse(JSON.stringify(people)), // Deep copy
+                                pickupPoint
+                            });
+                        } else {
+                            setInitError(result.error || 'Failed to initialize registration.');
+                        }
                     }
                 } catch (err: any) {
                     setInitError(err.message || 'An unexpected error occurred during initialization.');
@@ -160,14 +199,17 @@ export default function RegistrationPage() {
                     setIsInitializingRegistration(false);
                 }
             };
-            initRegistration();
-        }
-    }, [step, registrationId, people, totalAmount, pickupPoint, isInitializingRegistration]);
 
-    // Reset registration ID when returning to step 1 (editing details)
+            // Trigger initialization if we don't have an ID, or if the details changed
+            if (!registrationId || hasChanged()) {
+                initRegistration();
+            }
+        }
+    }, [step, registrationId, people, totalAmount, pickupPoint, isInitializingRegistration, lastSubmittedData]);
+
+    // Reset initError when returning to step 1 (editing details)
     useEffect(() => {
         if (step === 1) {
-            setRegistrationId(null);
             setInitError('');
         }
     }, [step]);
@@ -391,6 +433,7 @@ export default function RegistrationPage() {
                 setPickupPointError('');
                 setScreenshotError('');
                 setRegistrationId(null);
+                setLastSubmittedData(null);
             } else {
                 setGeneralError(result.error || 'Registration update failed. Please try again.');
             }
@@ -411,6 +454,7 @@ export default function RegistrationPage() {
         setGeneralError('');
         setSubmissionResult(null);
         setRegistrationId(null);
+        setLastSubmittedData(null);
         if (typeof window !== 'undefined') {
             sessionStorage.removeItem('blr_picnic_registration_form');
             sessionStorage.removeItem('blr_picnic_pickup_point');

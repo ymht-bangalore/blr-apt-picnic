@@ -207,3 +207,24 @@ export async function uploadPaymentScreenshot(
         };
     }
 }
+
+/**
+ * Deletes a pending registration by ID.
+ */
+export async function deletePendingRegistration(
+    registrationId: string
+): Promise<{ success: boolean; error?: string }> {
+    try {
+        const response = await fetch(`/api/submissions?id=${registrationId}`, {
+            method: 'DELETE',
+        });
+        if (response.ok) {
+            return {success: true};
+        } else {
+            const data = await response.json();
+            return {success: false, error: data.error || 'Failed to delete pending registration.'};
+        }
+    } catch (e: any) {
+        return {success: false, error: e.message || 'An unexpected error occurred during deletion.'};
+    }
+}
