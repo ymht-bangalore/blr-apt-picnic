@@ -398,27 +398,27 @@ export default function AdminDashboardPage() {
                             </div>
 
                             {/* Sort Selector */}
-                            <div className="flex items-center gap-2 shrink-0">
-                                <span
-                                    className="text-xs font-bold text-stone-500 flex items-center gap-1 mr-1 shrink-0">
-                                    <ArrowSort20Regular className="w-4 h-4 text-stone-500"/>
-                                    Sort:
-                                </span>
-                                <select
-                                    value={`${sortField}-${sortOrder}`}
-                                    onChange={(e) => {
-                                        const [field, order] = e.target.value.split('-') as ['date' | 'name', 'asc' | 'desc'];
-                                        setSortField(field);
-                                        setSortOrder(order);
-                                    }}
-                                    className="bg-white border border-stone-200 hover:bg-stone-50 rounded-xl px-3 py-2 text-xs font-bold text-stone-600 transition-all cursor-pointer focus:ring-2 focus:ring-primary/20 outline-none"
-                                >
-                                    <option value="date-desc">Date (Newest First)</option>
-                                    <option value="date-asc">Date (Oldest First)</option>
-                                    <option value="name-asc">Name (A - Z)</option>
-                                    <option value="name-desc">Name (Z - A)</option>
-                                </select>
-                            </div>
+                            {/*<div className="flex items-center gap-2 shrink-0">*/}
+                            {/*    <span*/}
+                            {/*        className="text-xs font-bold text-stone-500 flex items-center gap-1 mr-1 shrink-0">*/}
+                            {/*        <ArrowSort20Regular className="w-4 h-4 text-stone-500"/>*/}
+                            {/*        Sort:*/}
+                            {/*    </span>*/}
+                            {/*    <select*/}
+                            {/*        value={`${sortField}-${sortOrder}`}*/}
+                            {/*        onChange={(e) => {*/}
+                            {/*            const [field, order] = e.target.value.split('-') as ['date' | 'name', 'asc' | 'desc'];*/}
+                            {/*            setSortField(field);*/}
+                            {/*            setSortOrder(order);*/}
+                            {/*        }}*/}
+                            {/*        className="bg-white border border-stone-200 hover:bg-stone-50 rounded-xl px-3 py-2 text-xs font-bold text-stone-600 transition-all cursor-pointer focus:ring-2 focus:ring-primary/20 outline-none"*/}
+                            {/*    >*/}
+                            {/*        <option value="date-desc">Date (Newest First)</option>*/}
+                            {/*        <option value="date-asc">Date (Oldest First)</option>*/}
+                            {/*        <option value="name-asc">Name (A - Z)</option>*/}
+                            {/*        <option value="name-desc">Name (Z - A)</option>*/}
+                            {/*    </select>*/}
+                            {/*</div>*/}
 
                             {/* Download CSV button */}
                             <button
