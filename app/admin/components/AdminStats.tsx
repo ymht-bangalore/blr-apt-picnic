@@ -61,16 +61,22 @@ export default function AdminStats({submissions}: AdminStatsProps) {
 
     const renderStatusDetails = (pending: number, verified: number, cancelled: number) => (
         <div className="flex items-center gap-2 mt-1.5">
-            <span
-                className="flex items-center gap-1.5 text-[11px] text-amber-600 bg-amber-50/60 px-1.5 py-0.5 rounded-lg font-bold border border-amber-100/60">
-                <Clock16Regular className="w-3.5 h-3.5 shrink-0"/>
-                {pending}
-            </span>
-            <span
-                className="flex items-center gap-1.5 text-[11px] text-emerald-600 bg-emerald-50/60 px-1.5 py-0.5 rounded-lg font-bold border border-emerald-100/60">
-                <CheckmarkCircle16Regular className="w-3.5 h-3.5 shrink-0"/>
-                {verified}
-            </span>
+            {pending > 0 && (
+                <span
+                    className="flex items-center gap-1.5 text-[11px] text-amber-600 bg-amber-50/60 px-1.5 py-0.5 rounded-lg font-bold border border-amber-100/60">
+                    <Clock16Regular className="w-3.5 h-3.5 shrink-0"/>
+                    {pending}
+                </span>
+            )}
+
+            {verified > 0 && (
+                <span
+                    className="flex items-center gap-1.5 text-[11px] text-emerald-600 bg-emerald-50/60 px-1.5 py-0.5 rounded-lg font-bold border border-emerald-100/60">
+                    <CheckmarkCircle16Regular className="w-3.5 h-3.5 shrink-0"/>
+                    {verified}
+                </span>
+            )}
+
             {cancelled > 0 && (
                 <span
                     className="flex items-center gap-1.5 text-[11px] text-rose-600 bg-rose-50/60 px-1.5 py-0.5 rounded-lg font-bold border border-rose-100/60">
