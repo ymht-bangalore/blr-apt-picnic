@@ -1,6 +1,6 @@
 'use client';
 
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
     Copy20Regular,
     Checkmark20Regular,
@@ -34,6 +34,20 @@ export default function PaymentSection({amount, peopleCount, mainAttendeeName}: 
             });
         }, 100);
     };
+
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') {
+                if (showQRModal) {
+                    handleCloseQRModal();
+                } else if (showInstructions) {
+                    setShowInstructions(false);
+                }
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [showQRModal, showInstructions]);
 
     const upiId = privateConfig.upiId;
     const upiName = privateConfig.payeeName;

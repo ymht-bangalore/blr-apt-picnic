@@ -1,6 +1,6 @@
 'use client';
 
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
     Dismiss24Regular,
     Person20Regular,
@@ -48,6 +48,16 @@ export default function SubmissionDetailsModal({
                                                }: SubmissionDetailsModalProps) {
     const [updating, setUpdating] = useState(false);
     const [error, setError] = useState('');
+
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') {
+                onClose();
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [onClose]);
 
     const handleStatusChange = async (newStatus: string) => {
         if (newStatus === submission.status) return;

@@ -1,6 +1,6 @@
 'use client';
 
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {Dismiss24Regular, ArrowDownload24Regular, ZoomIn24Regular, ZoomOut24Regular} from '@fluentui/react-icons';
 
 interface ScreenshotModalProps {
@@ -13,9 +13,18 @@ export default function ScreenshotModal({imageUrl, onClose, personName}: Screens
     const [scale, setScale] = useState(1);
     const [hasError, setHasError] = useState(false);
 
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') {
+                onClose();
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [onClose]);
+
     const zoomIn = () => setScale(prev => Math.min(prev + 0.25, 3));
     const zoomOut = () => setScale(prev => Math.max(prev - 0.25, 0.5));
-    const resetZoom = () => setScale(1);
 
     // Check if it's a blob URL that might have expired
     const isBlobUrl = imageUrl.startsWith('blob:');
@@ -83,7 +92,7 @@ export default function ScreenshotModal({imageUrl, onClose, personName}: Screens
 
                 {/* Content Area */}
                 <div
-                    className="flex-1 overflow-auto p-6 bg-stone-100 min-h-[300px] flex items-center justify-center relative">
+                    className="flex-1 overflow-auto p-6 bg-stone-100 min-h-75 flex items-center justify-center relative">
                     {hasError ? (
                         <div className="text-center p-8 max-w-sm">
                             <span className="text-5xl">🖼️</span>
