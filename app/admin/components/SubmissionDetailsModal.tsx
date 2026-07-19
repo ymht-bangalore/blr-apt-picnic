@@ -21,6 +21,7 @@ interface Mahatma {
     name: string;
     mobile: string;
     ageGroup?: 'less-8' | 'more-8';
+    gender?: string;
 }
 
 interface Submission {
@@ -215,8 +216,8 @@ export default function SubmissionDetailsModal({
                                 Attendees ({submission.people.length})
                             </h4>
                             <span className="text-xs font-bold text-stone-500">
-                Fare: ₹{publicConfig.picnicFare}/person
-              </span>
+                                Fare: ₹{publicConfig.picnicFare}/person
+                            </span>
                         </div>
                         <div className="space-y-2 max-h-80 overflow-y-auto pr-1">
                             {submission.people.map((person, idx) => (
@@ -246,6 +247,15 @@ export default function SubmissionDetailsModal({
                                                     className="bg-stone-100 text-stone-700 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider select-none">
                                                     {person.ageGroup === 'less-8' ? 'Age less than 8' : 'Age 8 and above'}
                                                 </span>
+                                                {/*{person.gender && (*/}
+                                                {/*    <>*/}
+                                                {/*        <span className="text-stone-300 select-none">•</span>*/}
+                                                {/*        <span*/}
+                                                {/*            className="bg-primary-light/60 text-primary px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider select-none">*/}
+                                                {/*            {person.gender}*/}
+                                                {/*        </span>*/}
+                                                {/*    </>*/}
+                                                {/*)}*/}
                                             </div>
                                         </div>
                                     </div>

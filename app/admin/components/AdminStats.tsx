@@ -102,7 +102,7 @@ export default function AdminStats({submissions}: AdminStatsProps) {
             detail: (
                 <div className="flex items-center gap-1 mt-1 text-[11px] text-stone-500 font-bold">
                     <Clock16Regular className="w-3.5 h-3.5 text-amber-500 shrink-0"/>
-                    <span>+ ₹{totalPendingRevenue.toLocaleString()} pending</span>
+                    <span>+ ₹{totalPendingRevenue.toLocaleString()} pending verification</span>
                 </div>
             ),
             icon: Money24Regular,

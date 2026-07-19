@@ -24,6 +24,7 @@ import AdminLogin from './components/AdminLogin';
 import AdminStats from './components/AdminStats';
 import PickupPointStats from './components/PickupPointStats';
 import AgeStats from './components/AgeStats';
+import GenderStats from './components/GenderStats';
 import SubmissionDetailsModal from './components/SubmissionDetailsModal';
 import ScreenshotModal from './components/ScreenshotModal';
 import {printReceipt} from '@/lib/receipt';
@@ -32,6 +33,7 @@ interface Mahatma {
     name: string;
     mobile: string;
     ageGroup?: 'less-8' | 'more-8';
+    gender?: string;
 }
 
 interface Submission {
@@ -191,7 +193,7 @@ export default function AdminDashboardPage() {
 
         // 1. Compile CSV rows with all attendees
         const rows: string[][] = [
-            ['S.No', 'Attendee Name', 'Attendee Age Group', 'Attendee Mobile', 'Pickup Point', 'Primary Contact Name', 'Primary Contact Mobile', 'Fare Paid (₹)', 'Verification Status', 'Submission Date']
+            ['S.No', 'Attendee Name', 'Gender', 'Attendee Age Group', 'Attendee Mobile', 'Pickup Point', 'Primary Contact Name', 'Primary Contact Mobile', 'Fare Paid (₹)', 'Verification Status', 'Submission Date']
         ];
 
         let counter = 1;
@@ -215,6 +217,7 @@ export default function AdminDashboardPage() {
                 rows.push([
                     counter.toString(),
                     person.name,
+                    person.gender || 'Unspecified',
                     ageGroupText,
                     person.mobile || '',
                     pickupPoint,
@@ -337,9 +340,10 @@ export default function AdminDashboardPage() {
                 <AdminStats submissions={submissions}/>
 
                 {/* Analytics Section (Side-by-Side Cards) */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
                     <PickupPointStats submissions={submissions}/>
                     <AgeStats submissions={submissions}/>
+                    <GenderStats submissions={submissions}/>
                 </div>
 
                 {/* Filter, Search & Table Container */}

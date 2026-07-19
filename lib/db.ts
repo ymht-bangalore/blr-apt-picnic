@@ -4,6 +4,7 @@ export interface Mahatma {
     name: string;
     mobile: string;
     ageGroup: 'less-8' | 'more-8' | '';
+    gender?: string;
 }
 
 export interface RegistrationResult {

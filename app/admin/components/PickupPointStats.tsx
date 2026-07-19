@@ -45,12 +45,13 @@ export default function PickupPointStats({submissions}: PickupPointStatsProps) {
             {/* Header */}
             <div className="flex items-center justify-between gap-3 border-b border-stone-100 pb-2 mb-2">
                 <div className="flex items-center gap-2">
-                    <Location20Regular className="text-primary w-5 h-5 shrink-0" />
+                    <Location20Regular className="text-primary w-5 h-5 shrink-0"/>
                     <h2 className="text-sm font-extrabold text-stone-900 tracking-tight">
                         Pickup Point Distribution
                     </h2>
                 </div>
-                <span className="bg-emerald-50 border border-emerald-100 text-emerald-700 text-[10px] font-black px-2 py-0.5 rounded-md uppercase tracking-wider">
+                <span
+                    className="bg-emerald-50 border border-emerald-100 text-emerald-700 text-[10px] font-black px-2 py-0.5 rounded-md uppercase tracking-wider">
                     Total: {totalVerifiedAttendees}
                 </span>
             </div>
@@ -59,29 +60,29 @@ export default function PickupPointStats({submissions}: PickupPointStatsProps) {
             <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
                     <thead>
-                        <tr className="border-b border-stone-100">
-                            <th className="py-1.5 text-[10px] font-bold uppercase tracking-wider text-stone-400">
-                                Pickup Point
-                            </th>
-                            <th className="py-1.5 text-[10px] font-bold uppercase tracking-wider text-stone-400 text-right">
-                                Mahatmas Count
-                            </th>
-                        </tr>
+                    <tr className="border-b border-stone-100">
+                        <th className="py-1.5 text-[10px] font-bold uppercase tracking-wider text-stone-400">
+                            Pickup Point
+                        </th>
+                        <th className="py-1.5 text-[10px] font-bold uppercase tracking-wider text-stone-400 text-right">
+                            Verified Count
+                        </th>
+                    </tr>
                     </thead>
                     <tbody className="divide-y divide-stone-50">
-                        {pickupPoints.map((opt) => {
-                            const count = counts[opt.name] || 0;
-                            return (
-                                <tr key={opt.id} className="hover:bg-stone-50/50 transition-colors">
-                                    <td className="py-2 text-xs font-bold text-stone-700">
-                                        {opt.name}
-                                    </td>
-                                    <td className="py-2 text-xs font-bold text-stone-900 text-right font-mono">
-                                        {count}
-                                    </td>
-                                </tr>
-                            );
-                        })}
+                    {pickupPoints.map((opt) => {
+                        const count = counts[opt.name] || 0;
+                        return (
+                            <tr key={opt.id} className="hover:bg-stone-50/50 transition-colors">
+                                <td className="py-2 text-xs font-bold text-stone-700">
+                                    {opt.name}
+                                </td>
+                                <td className="py-2 text-xs font-bold text-stone-900 text-right font-mono">
+                                    {count}
+                                </td>
+                            </tr>
+                        );
+                    })}
                     </tbody>
                 </table>
             </div>
