@@ -71,11 +71,13 @@ export default function AdminStats({submissions}: AdminStatsProps) {
                 <CheckmarkCircle16Regular className="w-3.5 h-3.5 shrink-0"/>
                 {verified}
             </span>
-            <span
-                className="flex items-center gap-1.5 text-[11px] text-rose-600 bg-rose-50/60 px-1.5 py-0.5 rounded-lg font-bold border border-rose-100/60">
-                <DismissCircle16Regular className="w-3.5 h-3.5 shrink-0"/>
-                {cancelled}
-            </span>
+            {cancelled > 0 && (
+                <span
+                    className="flex items-center gap-1.5 text-[11px] text-rose-600 bg-rose-50/60 px-1.5 py-0.5 rounded-lg font-bold border border-rose-100/60">
+                    <DismissCircle16Regular className="w-3.5 h-3.5 shrink-0"/>
+                    {cancelled}
+                </span>
+            )}
         </div>
     );
 
