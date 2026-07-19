@@ -2,6 +2,7 @@
 
 import React from 'react';
 import {Location24Regular} from '@fluentui/react-icons';
+import {publicConfig} from '@/lib/publicConfig';
 
 interface PickupPointSelectorProps {
     value: string;
@@ -10,15 +11,7 @@ interface PickupPointSelectorProps {
 }
 
 export default function PickupPointSelector({value, onChange, error}: PickupPointSelectorProps) {
-    const options = [
-        {id: 'akshay-nagar', name: 'Akshay Nagar (NRI Layout)'},
-        {id: 'hedge-nagar', name: 'Hedge Nagar'},
-        {id: 'iskcon', name: 'Iskcon Rajaji Nagar'},
-        {id: 'ms-palya', name: 'MS Palya'},
-        {id: 'mysore-bank', name: 'Mysore Bank (Majestic)'},
-        {id: 'whitefield', name: 'Whitefield'},
-        {id: 'self', name: 'Self'},
-    ];
+    const options = publicConfig.pickupPoints;
 
     return (
         <div className="bg-white rounded-2xl shadow-sm border border-stone-150 p-6 sm:p-8 mb-6">

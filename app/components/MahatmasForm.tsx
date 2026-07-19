@@ -85,8 +85,8 @@ export default function MahatmasForm({people, onChange, errors}: MahatmasFormPro
                 </div>
                 <span
                     className="bg-[#FDF1ED] text-primary text-xs font-bold px-2.5 py-1 rounded-md border border-primary/20">
-          Total: {people.length} {people.length === 1 ? 'Person' : 'People'}
-        </span>
+                  Total: {people.length} {people.length === 1 ? 'Person' : 'People'}
+                </span>
             </div>
 
             <div className="space-y-6">

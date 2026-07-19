@@ -22,6 +22,8 @@ import {
 // Import subcomponents
 import AdminLogin from './components/AdminLogin';
 import AdminStats from './components/AdminStats';
+import PickupPointStats from './components/PickupPointStats';
+import AgeStats from './components/AgeStats';
 import SubmissionDetailsModal from './components/SubmissionDetailsModal';
 import ScreenshotModal from './components/ScreenshotModal';
 import {printReceipt} from '@/lib/receipt';
@@ -333,6 +335,12 @@ export default function AdminDashboardPage() {
 
                 {/* Stats Panel */}
                 <AdminStats submissions={submissions}/>
+
+                {/* Analytics Section (Side-by-Side Cards) */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+                    <PickupPointStats submissions={submissions}/>
+                    <AgeStats submissions={submissions}/>
+                </div>
 
                 {/* Filter, Search & Table Container */}
                 <div className="bg-white rounded-3xl border border-stone-150 shadow-sm overflow-hidden">
