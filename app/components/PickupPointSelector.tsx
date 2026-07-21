@@ -11,7 +11,9 @@ interface PickupPointSelectorProps {
 }
 
 export default function PickupPointSelector({value, onChange, error}: PickupPointSelectorProps) {
-    const options = publicConfig.pickupPoints;
+    const options = publicConfig.pickupPoints.filter(
+        (point) => point.id !== "iskcon"
+    );
 
     return (
         <div className="bg-white rounded-2xl shadow-sm border border-stone-150 p-6 sm:p-8 mb-6">
