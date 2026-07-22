@@ -8,6 +8,7 @@ import {ArrowRight20Filled, Location20Filled} from '@fluentui/react-icons';
 
 // Import Components
 import RegistrationHeader from './components/RegistrationHeader';
+import BusNoticeBanner from './components/BusNoticeBanner';
 import MahatmasForm from './components/MahatmasForm';
 import PaymentSection from './components/PaymentSection';
 import UploadSection from './components/UploadSection';
@@ -18,7 +19,7 @@ import PickupPointSelector from './components/PickupPointSelector';
 export default function RegistrationPage() {
     // Form States
     const [people, setPeople] = useState<Mahatma[]>([{name: '', mobile: '', ageGroup: ''}]);
-    const [pickupPoint, setPickupPoint] = useState<string>('');
+    const [pickupPoint, setPickupPoint] = useState<string>(publicConfig.busRegistrationClosed ? 'Self' : '');
     const [screenshot, setScreenshot] = useState<File | null>(null);
     const [step, setStep] = useState<1 | 2>(1);
     const [isReviewing, setIsReviewing] = useState<boolean>(false);
@@ -102,7 +103,14 @@ export default function RegistrationPage() {
             }
             const savedPickup = sessionStorage.getItem('blr_picnic_pickup_point');
             if (savedPickup) {
-                setPickupPoint(savedPickup);
+                const isSavedPickupFull = publicConfig.pickupPoints.find(p => p.name === savedPickup)?.isFull;
+                if (isSavedPickupFull || (publicConfig.busRegistrationClosed && savedPickup !== 'Self')) {
+                    setPickupPoint('Self');
+                } else {
+                    setPickupPoint(savedPickup);
+                }
+            } else if (publicConfig.busRegistrationClosed) {
+                setPickupPoint('Self');
             }
         }
     }, []);
@@ -246,6 +254,11 @@ export default function RegistrationPage() {
     const validatePickupPoint = (): boolean => {
         if (!pickupPoint || !pickupPoint.trim()) {
             setPickupPointError('Please select a pickup point.');
+            return false;
+        }
+        const selectedOpt = publicConfig.pickupPoints.find(p => p.name === pickupPoint);
+        if (selectedOpt?.isFull || (publicConfig.busRegistrationClosed && pickupPoint !== 'Self')) {
+            setPickupPointError('Bus pickup seats are full. Please select "Self" to proceed.');
             return false;
         }
         setPickupPointError('');
@@ -481,6 +494,9 @@ export default function RegistrationPage() {
         <div className="flex-1 w-full flex flex-col min-h-screen">
             <main className="flex-1 max-w-4xl w-full mx-auto pt-8 px-4 sm:px-6 lg:px-8">
                 <RegistrationHeader/>
+
+                {/* Bus Full Notice Banner */}
+                <BusNoticeBanner/>
 
                 {/* Stepper Progress Indicator */}
                 <Stepper currentStep={step} onStepClick={handleStepClick}/>

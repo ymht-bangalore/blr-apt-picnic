@@ -4,6 +4,7 @@
 export interface PickupPointOption {
     id: string;
     name: string;
+    isFull?: boolean; // Optional: set true for a specific point to close only that individual pickup point
 }
 
 export const publicConfig = {
@@ -14,13 +15,54 @@ export const publicConfig = {
     departureTime: "6:30 AM (tentative) from respective pickup points",
     returnTime: "Bus leaves picnic spot by 4:00 PM",
     picnicFare: 700, // Fare amount in ₹ per person
+
+    // TOGGLE SWITCH FOR BUS REGISTRATIONS:
+    // Set to `true` to close all bus pickup points & display "All Buses Full" notice.
+    // Set to `false` to open bus pickup registrations again.
+    busRegistrationClosed: true,
+
+    busNotice: {
+        badge: "Bus Registrations Full",
+        title: "All Buses Are Full – Self Transportation Only",
+        message: "Jai Satchitanand! All bus pickup points are now fully booked, and we are no longer taking bus registrations. If you would like to join the picnic with Aptaputra Bhaio, please plan your transportation independently.",
+        subMessage: "You can still complete your picnic registration below by selecting 'Self' as your travel option."
+    },
+
     pickupPoints: [
-        {id: 'akshay-nagar', name: 'Akshay Nagar (NRI Layout)'},
-        {id: 'hedge-nagar', name: 'Hedge Nagar'},
-        {id: 'iskcon', name: 'Iskcon Rajaji Nagar'},
-        {id: 'ms-palya', name: 'MS Palya'},
-        {id: 'mysore-bank', name: 'Mysore Bank (Majestic)'},
-        {id: 'whitefield', name: 'Whitefield'},
-        {id: 'self', name: 'Self'},
+        {
+            id: 'akshay-nagar',
+            name: 'Akshay Nagar (NRI Layout)',
+            isFull: false
+        },
+        {
+            id: 'hedge-nagar',
+            name: 'Hedge Nagar',
+            isFull: false
+        },
+        {
+            id: 'iskcon',
+            name: 'Iskcon Rajaji Nagar',
+            isFull: false
+        },
+        {
+            id: 'ms-palya',
+            name: 'MS Palya',
+            isFull: false
+        },
+        {
+            id: 'mysore-bank',
+            name: 'Mysore Bank (Majestic)',
+            isFull: false
+        },
+        {
+            id: 'whitefield',
+            name: 'Whitefield',
+            isFull: false
+        },
+        {
+            id: 'self',
+            name: 'Self',
+            isFull: false
+        },
     ] as PickupPointOption[]
 };
