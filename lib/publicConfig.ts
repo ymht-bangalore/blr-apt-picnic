@@ -16,6 +16,18 @@ export const publicConfig = {
     returnTime: "Bus leaves picnic spot by 4:00 PM",
     picnicFare: 700, // Fare amount in ₹ per person
 
+    // TOGGLE SWITCH FOR ALL REGISTRATIONS:
+    // Set to `true` to close all registrations completely & display "Registrations Closed" notice.
+    // Set to `false` to open registrations.
+    registrationClosed: true,
+
+    closedNotice: {
+        badge: "Registrations Closed",
+        title: "Picnic Registrations Are Now Closed",
+        message: "Jai Satchitanand! Registrations for the Bengaluru Picnic with Aptaputra Bhaio are now officially closed. Thank you to all mahatmas for your overwhelming response!",
+        subMessage: "If you have already registered and are not yet added to the WhatsApp group, please contact 9008374455 (Bhavesh Patel)."
+    },
+
     // TOGGLE SWITCH FOR BUS REGISTRATIONS:
     // Set to `true` to close all bus pickup points & display "All Buses Full" notice.
     // Set to `false` to open bus pickup registrations again.

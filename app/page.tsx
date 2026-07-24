@@ -9,6 +9,7 @@ import {ArrowRight20Filled, Location20Filled} from '@fluentui/react-icons';
 // Import Components
 import RegistrationHeader from './components/RegistrationHeader';
 import BusNoticeBanner from './components/BusNoticeBanner';
+import RegistrationClosedBanner from './components/RegistrationClosedBanner';
 import MahatmasForm from './components/MahatmasForm';
 import PaymentSection from './components/PaymentSection';
 import UploadSection from './components/UploadSection';
@@ -495,244 +496,253 @@ export default function RegistrationPage() {
             <main className="flex-1 max-w-4xl w-full mx-auto pt-8 px-4 sm:px-6 lg:px-8">
                 <RegistrationHeader/>
 
-                {/* Bus Full Notice Banner */}
-                <BusNoticeBanner/>
+                {publicConfig.registrationClosed ? (
+                    <RegistrationClosedBanner/>
+                ) : (
+                    <>
+                        {/* Bus Full Notice Banner */}
+                        <BusNoticeBanner/>
 
-                {/* Stepper Progress Indicator */}
-                <Stepper currentStep={step} onStepClick={handleStepClick}/>
+                        {/* Stepper Progress Indicator */}
+                        <Stepper currentStep={step} onStepClick={handleStepClick}/>
 
-                <form id="registration-form" onSubmit={handleSubmit}
-                      className="space-y-6 scroll-mt-6">
-                    {step === 1 ? (
-                        isReviewing ? (
-                            <>
-                                {/* Review/Confirm Attendee Details View */}
-                                <div
-                                    className="bg-white rounded-2xl shadow-sm border border-stone-150 p-6 sm:p-8 mb-6 animate-scale-up">
-                                    <div className="border-b border-stone-100 pb-4 mb-6">
-                                        <h2 className="text-xl font-bold text-stone-900">Confirm Registration
-                                            Details</h2>
-                                        <p className="text-sm text-stone-600 mt-1">Please review the attendee details
-                                            below before proceeding to payment.</p>
-                                    </div>
+                        <form id="registration-form" onSubmit={handleSubmit}
+                              className="space-y-6 scroll-mt-6">
+                            {step === 1 ? (
+                                isReviewing ? (
+                                    <>
+                                        {/* Review/Confirm Attendee Details View */}
+                                        <div
+                                            className="bg-white rounded-2xl shadow-sm border border-stone-150 p-6 sm:p-8 mb-6 animate-scale-up">
+                                            <div className="border-b border-stone-100 pb-4 mb-6">
+                                                <h2 className="text-xl font-bold text-stone-900">Confirm Registration
+                                                    Details</h2>
+                                                <p className="text-sm text-stone-600 mt-1">Please review the attendee
+                                                    details below before proceeding to payment.</p>
+                                            </div>
 
-                                    {/* Selected Pickup Point Summary */}
-                                    <div
-                                        className="mb-6 p-4 rounded-xl border border-primary/20 bg-primary-light flex items-center justify-between gap-3 animate-scale-up">
-                                        <div className="flex items-center gap-3">
+                                            {/* Selected Pickup Point Summary */}
                                             <div
-                                                className="w-10 h-10 rounded-xl bg-white border border-primary/10 flex items-center justify-center text-primary shrink-0 shadow-sm">
-                                                <Location20Filled className="w-5 h-5"/>
-                                            </div>
-                                            <div>
-                                                <p className="text-xs text-primary font-bold uppercase tracking-wider">Selected
-                                                    Pickup Point</p>
-                                                <p className="text-sm font-extrabold text-stone-900">{pickupPoint}</p>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Attendees List cards */}
-                                    <div className="space-y-3">
-                                        {people.map((person, index) => {
-                                            const ageLabel = person.ageGroup === 'less-8'
-                                                ? 'Age less than 8 (Half Price)'
-                                                : 'Age 8 and above (Full Price)';
-                                            const personFare = person.ageGroup === 'less-8'
-                                                ? Math.round(publicConfig.picnicFare / 2)
-                                                : publicConfig.picnicFare;
-
-                                            return (
-                                                <div
-                                                    key={index}
-                                                    className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border border-stone-200 rounded-xl bg-stone-50/50 hover:bg-stone-50 transition-all gap-3"
-                                                >
-                                                    <div className="flex items-center gap-3">
-                                                        <div
-                                                            className="w-8 h-8 rounded-xl bg-primary-light text-primary font-bold text-sm flex items-center justify-center shrink-0">
-                                                            {index + 1}
-                                                        </div>
-                                                        <div>
-                                                            <p className="text-sm font-bold text-stone-900">
-                                                                {person.name} {index === 0 && <span
-                                                                className="text-xs text-primary font-bold">(Primary Contact)</span>}
-                                                            </p>
-                                                            <p className="text-xs text-stone-500 font-mono mt-0.5">{person.mobile || '—'}</p>
-                                                        </div>
-                                                    </div>
+                                                className="mb-6 p-4 rounded-xl border border-primary/20 bg-primary-light flex items-center justify-between gap-3 animate-scale-up">
+                                                <div className="flex items-center gap-3">
                                                     <div
-                                                        className="flex items-center justify-between sm:justify-end gap-4 border-t sm:border-t-0 border-stone-200 pt-2 sm:pt-0">
-                                                        <span
-                                                            className="text-xs font-semibold bg-stone-200/60 text-stone-750 px-2 py-0.5 rounded-md">
-                                                            {ageLabel}
-                                                        </span>
-                                                        <span
-                                                            className="text-sm font-extrabold text-stone-900 font-mono">
-                                                            ₹{personFare}
-                                                        </span>
+                                                        className="w-10 h-10 rounded-xl bg-white border border-primary/10 flex items-center justify-center text-primary shrink-0 shadow-sm">
+                                                        <Location20Filled className="w-5 h-5"/>
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-xs text-primary font-bold uppercase tracking-wider">Selected
+                                                            Pickup Point</p>
+                                                        <p className="text-sm font-extrabold text-stone-900">{pickupPoint}</p>
                                                     </div>
                                                 </div>
-                                            );
-                                        })}
-                                    </div>
+                                            </div>
 
-                                    {/* Total Fare calculation summary */}
-                                    <div
-                                        className="mt-6 pt-5 border-t border-dashed border-stone-200 flex justify-between items-center">
-                                        <div>
-                                            <span className="text-stone-600 font-bold text-xs uppercase block">Total Amount</span>
-                                            <span className="text-xs text-stone-500">
-                                                Based on age group pricing ({people.length} {people.length === 1 ? 'person' : 'people'})
-                                            </span>
+                                            {/* Attendees List cards */}
+                                            <div className="space-y-3">
+                                                {people.map((person, index) => {
+                                                    const ageLabel = person.ageGroup === 'less-8'
+                                                        ? 'Age less than 8 (Half Price)'
+                                                        : 'Age 8 and above (Full Price)';
+                                                    const personFare = person.ageGroup === 'less-8'
+                                                        ? Math.round(publicConfig.picnicFare / 2)
+                                                        : publicConfig.picnicFare;
+
+                                                    return (
+                                                        <div
+                                                            key={index}
+                                                            className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border border-stone-200 rounded-xl bg-stone-50/50 hover:bg-stone-50 transition-all gap-3"
+                                                        >
+                                                            <div className="flex items-center gap-3">
+                                                                <div
+                                                                    className="w-8 h-8 rounded-xl bg-primary-light text-primary font-bold text-sm flex items-center justify-center shrink-0">
+                                                                    {index + 1}
+                                                                </div>
+                                                                <div>
+                                                                    <p className="text-sm font-bold text-stone-900">
+                                                                        {person.name} {index === 0 && <span
+                                                                        className="text-xs text-primary font-bold">(Primary Contact)</span>}
+                                                                    </p>
+                                                                    <p className="text-xs text-stone-500 font-mono mt-0.5">{person.mobile || '—'}</p>
+                                                                </div>
+                                                            </div>
+                                                            <div
+                                                                className="flex items-center justify-between sm:justify-end gap-4 border-t sm:border-t-0 border-stone-200 pt-2 sm:pt-0">
+                                                                <span
+                                                                    className="text-xs font-semibold bg-stone-200/60 text-stone-750 px-2 py-0.5 rounded-md">
+                                                                    {ageLabel}
+                                                                </span>
+                                                                <span
+                                                                    className="text-sm font-extrabold text-stone-900 font-mono">
+                                                                    ₹{personFare}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+
+                                            {/* Total Fare calculation summary */}
+                                            <div
+                                                className="mt-6 pt-5 border-t border-dashed border-stone-200 flex justify-between items-center">
+                                                <div>
+                                                    <span className="text-stone-600 font-bold text-xs uppercase block">Total Amount</span>
+                                                    <span className="text-xs text-stone-500">
+                                                        Based on age group pricing ({people.length} {people.length === 1 ? 'person' : 'people'})
+                                                    </span>
+                                                </div>
+                                                <span className="text-2xl font-black text-stone-950 font-mono">
+                                                    ₹{totalAmount.toLocaleString('en-IN')}
+                                                </span>
+                                            </div>
                                         </div>
-                                        <span className="text-2xl font-black text-stone-950 font-mono">
-                                            ₹{totalAmount.toLocaleString('en-IN')}
-                                        </span>
-                                    </div>
-                                </div>
 
-                                {/* Actions */}
-                                <div className="flex flex-col sm:flex-row gap-3 pt-2 pb-8">
-                                    <button
-                                        type="button"
-                                        onClick={handleBack}
-                                        className="flex-1 py-3.5 px-6 rounded-2xl bg-white hover:bg-stone-50 text-stone-750 font-bold text-sm border border-stone-200 shadow-sm transition-all active:scale-[0.98] cursor-pointer"
-                                    >
-                                        Edit Details
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => {
-                                            navigateTo(2, true, 'push');
-                                            window.scrollTo({top: 0, behavior: 'smooth'});
-                                        }}
-                                        className="flex-1 flex items-center justify-center gap-2 py-3.5 px-6 rounded-2xl bg-primary hover:bg-primary-hover text-white font-bold text-sm shadow-md transition-all active:scale-[0.98] cursor-pointer animate-pulse"
-                                    >
-                                        Proceed to Payment
-                                        <ArrowRight20Filled className="shrink-0 w-5 h-5"/>
-                                    </button>
-                                </div>
-                            </>
-                        ) : (
-                            <>
-                                {/* Pickup Point Selector - Mandatory, At the start */}
-                                <PickupPointSelector
-                                    value={pickupPoint}
-                                    onChange={(val) => {
-                                        setPickupPoint(val);
-                                        if (pickupPointError) {
-                                            setPickupPointError('');
-                                        }
-                                    }}
-                                    error={pickupPointError}
-                                />
+                                        {/* Actions */}
+                                        <div className="flex flex-col sm:flex-row gap-3 pt-2 pb-8">
+                                            <button
+                                                type="button"
+                                                onClick={handleBack}
+                                                className="flex-1 py-3.5 px-6 rounded-2xl bg-white hover:bg-stone-50 text-stone-750 font-bold text-sm border border-stone-200 shadow-sm transition-all active:scale-[0.98] cursor-pointer"
+                                            >
+                                                Edit Details
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    navigateTo(2, true, 'push');
+                                                    window.scrollTo({top: 0, behavior: 'smooth'});
+                                                }}
+                                                className="flex-1 flex items-center justify-center gap-2 py-3.5 px-6 rounded-2xl bg-primary hover:bg-primary-hover text-white font-bold text-sm shadow-md transition-all active:scale-[0.98] cursor-pointer animate-pulse"
+                                            >
+                                                Proceed to Payment
+                                                <ArrowRight20Filled className="shrink-0 w-5 h-5"/>
+                                            </button>
+                                        </div>
+                                    </>
+                                ) : (
+                                    <>
+                                        {/* Pickup Point Selector - Mandatory, At the start */}
+                                        <PickupPointSelector
+                                            value={pickupPoint}
+                                            onChange={(val) => {
+                                                setPickupPoint(val);
+                                                if (pickupPointError) {
+                                                    setPickupPointError('');
+                                                }
+                                            }}
+                                            error={pickupPointError}
+                                        />
 
-                                {/* Step 1: Attendee Details Form */}
-                                <MahatmasForm
-                                    people={people}
-                                    onChange={handlePeopleChange}
-                                    errors={errors}
-                                />
+                                        {/* Step 1: Attendee Details Form */}
+                                        <MahatmasForm
+                                            people={people}
+                                            onChange={handlePeopleChange}
+                                            errors={errors}
+                                        />
 
-                                {/* Proceed Button */}
-                                <div className="pt-2 pb-8">
-                                    <button
-                                        type="button"
-                                        onClick={handleNextStep}
-                                        className="w-full flex items-center justify-center gap-2 py-4 px-6 rounded-2xl text-white font-bold text-base shadow-md transition-all bg-primary hover:bg-primary-hover hover:shadow-lg focus:ring-4 focus:ring-primary/20 active:scale-[0.98] cursor-pointer"
-                                    >
-                                        Proceed to Review
-                                        <ArrowRight20Filled className="shrink-0"/>
-                                    </button>
-                                </div>
-                            </>
-                        )
-                    ) : (
-                        <>
-                            {/* Step 2: Payment Details */}
-                            <div id="payment-details-section" className="scroll-mt-6">
-                                <PaymentSection
-                                    amount={totalAmount}
-                                    peopleCount={people.length}
-                                    mainAttendeeName={people[0]?.name || ''}
-                                />
-                            </div>
-
-                            {/* Step 3: Screenshot & Submissions */}
-                            <UploadSection
-                                screenshot={screenshot}
-                                onScreenshotChange={handleScreenshotChange}
-                                error={screenshotError}
-                            />
-
-                            {/* Error Banner */}
-                            {generalError && (
-                                <div
-                                    className="bg-red-50 border border-red-200 rounded-2xl p-4 text-sm text-red-700 flex flex-col gap-1">
-                                    <span className="font-bold">Registration Error</span>
-                                    <span>{generalError}</span>
-                                </div>
-                            )}
-
-                            {initError && (
-                                <div className="mb-4 animate-scale-up">
-                                    <Alert
-                                        type="error"
-                                        message={`Registration initialization failed: ${initError}. Please go back to step 1, verify details, and try again.`}
-                                    />
-                                </div>
-                            )}
-
-                            {/* Sticky Bottom Actions Bar */}
-                            <div
-                                className="sticky bottom-0 left-0 right-0 z-30 bg-white/85 backdrop-blur-md rounded-t-2xl border-t border-stone-150 py-4 px-4 sm:px-6 lg:px-8 -mx-4 sm:-mx-6 lg:-mx-8 shadow-[0_-4px_16px_rgba(45,36,29,0.05)] transition-all">
-                                <div className="max-w-4xl mx-auto flex items-center justify-end">
-                                    <button
-                                        type="submit"
-                                        disabled={isSubmitting || isInitializingRegistration || !!initError}
-                                        className={`w-full sm:w-auto min-w-50 flex items-center justify-center gap-2 py-3.5 px-6 rounded-2xl text-white font-bold text-base shadow-md transition-all ${
-                                            isSubmitting || isInitializingRegistration || !!initError
-                                                ? 'bg-stone-300 text-stone-500 cursor-not-allowed shadow-none'
-                                                : 'bg-primary hover:bg-primary-hover hover:shadow-lg focus:ring-4 focus:ring-primary/20 active:scale-[0.98] cursor-pointer'
-                                        }`}
-                                    >
-                                        {isInitializingRegistration ? (
-                                            <>
-                                                <svg
-                                                    className="animate-spin -ml-1 mr-3 h-5 w-5 text-stone-500 inline-block"
-                                                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                                    <circle className="opacity-25" cx="12" cy="12" r="10"
-                                                            stroke="currentColor"
-                                                            strokeWidth="4"></circle>
-                                                    <path className="opacity-75" fill="currentColor"
-                                                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                                </svg>
-                                                Initializing Registration...
-                                            </>
-                                        ) : isSubmitting ? (
-                                            <>
-                                                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline-block"
-                                                     xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                                    <circle className="opacity-25" cx="12" cy="12" r="10"
-                                                            stroke="currentColor"
-                                                            strokeWidth="4"></circle>
-                                                    <path className="opacity-75" fill="currentColor"
-                                                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                                </svg>
-                                                Submitting Registration...
-                                            </>
-                                        ) : (
-                                            <>
-                                                Submit Registration
+                                        {/* Proceed Button */}
+                                        <div className="pt-2 pb-8">
+                                            <button
+                                                type="button"
+                                                onClick={handleNextStep}
+                                                className="w-full flex items-center justify-center gap-2 py-4 px-6 rounded-2xl text-white font-bold text-base shadow-md transition-all bg-primary hover:bg-primary-hover hover:shadow-lg focus:ring-4 focus:ring-primary/20 active:scale-[0.98] cursor-pointer"
+                                            >
+                                                Proceed to Review
                                                 <ArrowRight20Filled className="shrink-0"/>
-                                            </>
-                                        )}
-                                    </button>
-                                </div>
-                            </div>
-                        </>
-                    )}
-                </form>
+                                            </button>
+                                        </div>
+                                    </>
+                                )
+                            ) : (
+                                <>
+                                    {/* Step 2: Payment Details */}
+                                    <div id="payment-details-section" className="scroll-mt-6">
+                                        <PaymentSection
+                                            amount={totalAmount}
+                                            peopleCount={people.length}
+                                            mainAttendeeName={people[0]?.name || ''}
+                                        />
+                                    </div>
+
+                                    {/* Step 3: Screenshot & Submissions */}
+                                    <UploadSection
+                                        screenshot={screenshot}
+                                        onScreenshotChange={handleScreenshotChange}
+                                        error={screenshotError}
+                                    />
+
+                                    {/* Error Banner */}
+                                    {generalError && (
+                                        <div
+                                            className="bg-red-50 border border-red-200 rounded-2xl p-4 text-sm text-red-700 flex flex-col gap-1">
+                                            <span className="font-bold">Registration Error</span>
+                                            <span>{generalError}</span>
+                                        </div>
+                                    )}
+
+                                    {initError && (
+                                        <div className="mb-4 animate-scale-up">
+                                            <Alert
+                                                type="error"
+                                                message={`Registration initialization failed: ${initError}. Please go back to step 1, verify details, and try again.`}
+                                            />
+                                        </div>
+                                    )}
+
+                                    {/* Sticky Bottom Actions Bar */}
+                                    <div
+                                        className="sticky bottom-0 left-0 right-0 z-30 bg-white/85 backdrop-blur-md rounded-t-2xl border-t border-stone-150 py-4 px-4 sm:px-6 lg:px-8 -mx-4 sm:-mx-6 lg:-mx-8 shadow-[0_-4px_16px_rgba(45,36,29,0.05)] transition-all">
+                                        <div className="max-w-4xl mx-auto flex items-center justify-end">
+                                            <button
+                                                type="submit"
+                                                disabled={isSubmitting || isInitializingRegistration || !!initError}
+                                                className={`w-full sm:w-auto min-w-50 flex items-center justify-center gap-2 py-3.5 px-6 rounded-2xl text-white font-bold text-base shadow-md transition-all ${
+                                                    isSubmitting || isInitializingRegistration || !!initError
+                                                        ? 'bg-stone-300 text-stone-500 cursor-not-allowed shadow-none'
+                                                        : 'bg-primary hover:bg-primary-hover hover:shadow-lg focus:ring-4 focus:ring-primary/20 active:scale-[0.98] cursor-pointer'
+                                                }`}
+                                            >
+                                                {isInitializingRegistration ? (
+                                                    <>
+                                                        <svg
+                                                            className="animate-spin -ml-1 mr-3 h-5 w-5 text-stone-500 inline-block"
+                                                            xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                            viewBox="0 0 24 24">
+                                                            <circle className="opacity-25" cx="12" cy="12" r="10"
+                                                                    stroke="currentColor"
+                                                                    strokeWidth="4"></circle>
+                                                            <path className="opacity-75" fill="currentColor"
+                                                                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                        </svg>
+                                                        Initializing Registration...
+                                                    </>
+                                                ) : isSubmitting ? (
+                                                    <>
+                                                        <svg
+                                                            className="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline-block"
+                                                            xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                            viewBox="0 0 24 24">
+                                                            <circle className="opacity-25" cx="12" cy="12" r="10"
+                                                                    stroke="currentColor"
+                                                                    strokeWidth="4"></circle>
+                                                            <path className="opacity-75" fill="currentColor"
+                                                                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                        </svg>
+                                                        Submitting Registration...
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        Submit Registration
+                                                        <ArrowRight20Filled className="shrink-0"/>
+                                                    </>
+                                                )}
+                                            </button>
+                                        </div>
+                                    </div>
+                                </>
+                            )}
+                        </form>
+                    </>
+                )}
             </main>
 
             {/* Warm Footer for Dada Bhagwan Mahatmas */}
