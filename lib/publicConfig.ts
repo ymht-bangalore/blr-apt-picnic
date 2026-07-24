@@ -19,7 +19,7 @@ export const publicConfig = {
     // TOGGLE SWITCH FOR ALL REGISTRATIONS:
     // Set to `true` to close all registrations completely & display "Registrations Closed" notice.
     // Set to `false` to open registrations.
-    registrationClosed: true,
+    registrationClosed: false,
 
     closedNotice: {
         badge: "Registrations Closed",
